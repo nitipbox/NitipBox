@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NitipBox — Jasa Titip Barang Surabaya & Sidoarjo | Mulai Rp 3.000/hari</title>
+
+  <meta name="description" content="NitipBox — jasa simpan & titip barang harian di Surabaya dan Sidoarjo. Mulai Rp 3.000/hari. Aman, terdokumentasi foto, kode unik per barang. Buka Senin–Minggu 08.00–21.00.">
+  <meta name="keywords" content="jasa titip barang Surabaya, jasa simpan barang Sidoarjo, storage harian Surabaya, titip barang murah, NitipBox">
+  <meta name="author" content="NitipBox">
+  <meta name="robots" content="index, follow">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://nitipbox.my.id">
+  <meta property="og:title" content="NitipBox — Titip Aman, Hati Tenang">
+  <meta property="og:description" content="Jasa simpan & titip barang harian di Surabaya & Sidoarjo. Mulai Rp 3.000/hari. Aman, terdokumentasi, ada kode unik per barang. Buka setiap hari 08.00–21.00.">
+  <meta property="og:image" content="https://lh3.googleusercontent.com/d/12d704beJlh-f1EYF2nd2JXntwuKlo5jJ">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="NitipBox">
+  <meta property="og:locale" content="id_ID">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="NitipBox — Titip Aman, Hati Tenang">
+  <meta name="twitter:description" content="Jasa simpan & titip barang harian di Surabaya & Sidoarjo. Mulai Rp 3.000/hari.">
+  <meta name="twitter:image" content="https://lh3.googleusercontent.com/d/12d704beJlh-f1EYF2nd2JXntwuKlo5jJ">
+
+  <link rel="canonical" href="https://nitipbox.my.id">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <div class="promo-banner" id="promoBanner">
+    <div class="promo-inner">
+      <div class="promo-text">
+        <div class="promo-title">🎉 PROMO SOFT LAUNCH — 10 Pelanggan Pertama!</div>
+        <div class="promo-sub">Titip pertama dapat diskon 20% • Berlaku sampai 7 Juli 2026</div>
+      </div>
+      <div class="promo-right">
+        <div class="countdown">
+          <div class="cd-box"><div class="cd-num" id="cdHari">00</div><div class="cd-lbl">Hari</div></div>
+          <div class="cd-sep">:</div>
+          <div class="cd-box"><div class="cd-num" id="cdJam">00</div><div class="cd-lbl">Jam</div></div>
+          <div class="cd-sep">:</div>
+          <div class="cd-box"><div class="cd-num" id="cdMenit">00</div><div class="cd-lbl">Menit</div></div>
+          <div class="cd-sep">:</div>
+          <div class="cd-box"><div class="cd-num" id="cdDetik">00</div><div class="cd-lbl">Detik</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="navbar">
+    <img src="https://lh3.googleusercontent.com/d/12d704beJlh-f1EYF2nd2JXntwuKlo5jJ" alt="Logo NitipBox" style="height: 105px; width: auto; object-fit: contain; display: block; margin: 0 auto;">
+  </div>
+
+  <div class="hero-container">
+    <div class="hero-left">
+      <h2>TITIP AMAN,<br><span>HATI TENANG</span> BERSAMA KAMI!</h2>
+      <p>NitipBox menyediakan ruang penyimpanan barang premium, fleksibel, dan terpantau penuh. Solusi terbaik untuk kebutuhan ruang ekstra barang-barang berhargamu tanpa rasa cemas.</p>
+      <div class="hero-stats">
+        <div class="stat-item"><div class="stat-val">100%</div><div class="stat-lbl">Jaminan Keamanan</div></div>
+        <div class="stat-item"><div class="stat-val">24/7</div><div class="stat-lbl">Pengawasan CCTV</div></div>
+        <div class="stat-item"><div class="stat-val">0%</div><div class="stat-lbl">Khawatir Ruang Sempit</div></div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="tab-container">
+        <button class="tab-btn active" onclick="switchTab('order')">📋 ORDER</button>
+        <button class="tab-btn" onclick="switchTab('tempo')">🔍 JATUH TEMPO</button>
+        <button class="tab-btn" onclick="switchTab('tarif')">💰 ESTIMASI BIAYA</button>
+      </div>
+      <div class="main-box">
+
+        <div id="section-order" class="content-section active">
+          <div id="formWrapper">
+            <form id="formJasa" onsubmit="submitFormOrder(this)">
+              <div class="field">
+                <label>Pilih Point / Lokasi NitipBox</label>
+                <select name="lokasi" id="selectLokasi" required>
+                  <option value="">-- Pilih lokasi terdekat --</option>
+                </select>
+                <div class="lokasi-note">
+                  <span style="flex-shrink:0;">ℹ️</span>
+                  <span>Pilihan lokasi ini sebagai preferensi. Admin akan konfirmasi ketersediaan via WhatsApp setelah booking diterima.</span>
+                </div>
+              </div>
+
+              <div class="field"><label>Tanggal Rencana Masuk</label><input type="date" name="tanggal" required></div>
+              <div class="field"><label>Nama Lengkap Anda</label><input type="text" name="nama" placeholder="Ketik nama sesuai KTP" required></div>
+              <div class="field"><label>Nomor WhatsApp (Aktif)</label><input type="text" name="wa" placeholder="Contoh: 081234567xxx" required></div>
+              <div class="field"><label>Barang Yang Mau Dititipkan?</label><input type="text" name="deskripsi" placeholder="Koper Besar / Sepatu" required></div>
+              <div class="field">
+                <label>Ukuran Barang</label>
+                <select name="ukuran" required>
+                  <option value="Kecil-S">Kecil - S (Rp 3.000/hari)</option>
+                  <option value="Sedang-M">Sedang - M (Rp 7.000/hari)</option>
+                  <option value="Besar-L">Besar - L (Rp 12.000/hari)</option>
+                  <option value="Sangat Besar-XL">Sangat Besar - XL (Rp 20.000/hari)</option>
+                  <option value="Super Besar-XXL+">Super Besar - XXL+ (Rp 50.000/hari)</option>
+                </select>
+              </div>
+              <div class="field"><label>Mau Disimpan Berapa Hari?</label><input type="number" name="hari" value="1" min="1" required></div>
+              <div class="field">
+                <label>Layanan Antar / Jemput?</label>
+                <select name="layanan" required>
+                  <option value="Tidak, Terimakasih">Tidak, Terimakasih</option>
+                  <option value="Penjemputan (+3.000/km)">Penjemputan (+3.000/km dari Lokasi)</option>
+                  <option value="Pengantaran (+3.000/km)">Pengantaran (+3.000/km dari Lokasi)</option>
+                  <option value="+ Keduanya (+5.000/km)">+ Keduanya (+5.000/km dari Lokasi)</option>
+                </select>
+              </div>
+              <div class="field"><label>No. Identitas (6 Angka Terakhir)</label><input type="text" name="identitas" pattern="[0-9]{6}" maxlength="6" placeholder="Contoh: 123456" required></div>
+
+              <div>
+                <span class="ref-toggle" onclick="toggleRef(this)">🎟️ Punya kode referral? Klik di sini</span>
+                <div class="ref-field" id="refField">
+                  <label>Kode Referral (Opsional)</label>
+                  <input type="text" id="inputReferral" placeholder="Contoh: REF-BUDI01" style="text-transform:uppercase">
+                  <div style="font-size:11px;color:#888;margin-top:4px">Kode referral dari teman yang mengajakmu. Akan dikirim ke admin via WA.</div>
+                </div>
+              </div>
+
+              <div class="sk-wrap">
+                <div class="sk-check-row">
+                  <input type="checkbox" id="checkSK" required>
+                  <label for="checkSK" class="sk-check-label">
+                    Saya telah membaca dan menyetujui <a onclick="bukaSK()">Syarat & Ketentuan NitipBox</a>. Saya memahami bahwa booking ini tunduk pada ketentuan yang berlaku.
+                  </label>
+                </div>
+              </div>
+
+              <button type="submit" id="btnOrder" class="btn-tosca">🟢 KIRIM FORM ORDERAN</button>
+            </form>
+          </div>
+
+          <div id="suksesCard" class="sukses-card">
+            <div class="sukses-header">
+              <span class="sukses-icon">✅</span>
+              <p class="sukses-title">BOOKING BERHASIL!</p>
+            </div>
+            <div class="sukses-body">
+              <div class="kode-booking-box">
+                <div class="kode-booking-label">KODE BOOKING ANDA</div>
+                <div class="kode-booking-val" id="kodeDisplay">NTB-0000</div>
+              </div>
+              <div class="steps-list">
+                <div class="step-row"><div class="step-circle">1</div><div>Simpan kode booking ini — kamu butuhkan saat ambil barang</div></div>
+                <div class="step-row"><div class="step-circle">2</div><div>Admin akan konfirmasi via WA dalam waktu singkat</div></div>
+                <div class="step-row"><div class="step-circle">3</div><div>Antarkan barang sesuai jadwal yang disepakati dengan admin</div></div>
+              </div>
+              <button class="btn-wa-kirim" onclick="kirimKeWA()">💬 Kirim Kode Booking ke Admin WA</button>
+              <button class="btn-order-lagi" onclick="orderLagi()">🔄 Buat Booking Baru</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="section-tempo" class="content-section">
+          <div class="field"><label>Masukkan Kode Booking Anda</label><input type="text" id="tempoKode" placeholder="Contoh: NTB-0001"></div>
+          <button onclick="prosesCekTempo()" id="btnTempo" class="btn-tosca">🔍 TRACK STATUS</button>
+          <div id="resTempo" class="result-box"></div>
+        </div>
+
+        <div id="section-tarif" class="content-section">
+          <div class="field">
+            <label>Pilih Ukuran Jasa Layanan</label>
+            <select id="tarifUkuran" onchange="hitungKalkulatorTarif()">
+              <option value="Kecil-S">Kecil - S (Rp 3.000/hari)</option>
+              <option value="Sedang-M">Sedang - M (Rp 7.000/hari)</option>
+              <option value="Besar-L">Besar - L (Rp 12.000/hari)</option>
+              <option value="Sangat Besar-XL">Sangat Besar - XL (Rp 20.000/hari)</option>
+              <option value="Super Besar-XXL+">Super Besar - XXL+ (Rp 50.000/hari)</option>
+            </select>
+          </div>
+          <div class="field"><label>Masukkan Jumlah Hari Penyimpanan</label><input type="number" id="tarifHari" value="1" min="1" oninput="hitungKalkulatorTarif()"></div>
+          <div class="calc-box">
+            <div style="font-weight:bold;margin-bottom:12px;text-align:center;color:#f57f17;">🧮 RINCIAN ESTIMASI BIAYA</div>
+            <div class="calc-row"><span>Tarif Dasar:</span><span id="outTarifDasar">Rp 3.000/hari</span></div>
+            <div class="calc-row"><span>Durasi:</span><span id="outHari">1 Hari</span></div>
+            <div class="calc-row"><span>Harga Kotor:</span><span id="outKotor">Rp 3.000</span></div>
+            <div class="calc-row" style="color:#c62828;font-weight:bold;"><span>Diskon Promo:</span><span id="outDiskon">Rp 0 (0%)</span></div>
+            <div class="calc-divider"></div>
+            <div class="calc-row" style="font-weight:bold;color:var(--tosca-theme);font-size:15px;"><span>Total Bayar:</span><span id="outTotal">Rp 3.000</span></div>
+            <div class="calc-row" style="font-weight:bold;color:#2e7d32;"><span>Minimal DP (30%):</span><span id="outDp">Rp 1.000</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="foto-section">
+    <h3>📦 Sistem Penyimpanan NitipBox</h3>
+    <p class="foto-subtitle">Setiap barang tersimpan rapi, berlabel, dan terdokumentasi — aman sampai kamu ambil kembali</p>
+    <div class="foto-grid">
+      <div class="foto-main">
+        <img src="https://lh3.googleusercontent.com/d/1LLJmOB00YaAzwz9es9FDUxawLjprUTvm" alt="Area penyimpanan NitipBox dengan rak berlabel NTB">
+      </div>
+      <div class="foto-side">
+        <img src="https://lh3.googleusercontent.com/d/1iIQMGqj8DViqMGpDrklGk03-7xls1Ivt" alt="Tim NitipBox siap melayani">
+        <img src="https://lh3.googleusercontent.com/d/1zBZZdhJRIOmQAPCMFiz0H-iHTiC6ZO3D" alt="Admin NitipBox mengelola barang titipan">
+      </div>
+    </div>
+    <p class="foto-caption">Ilustrasi sistem penyimpanan NitipBox</p>
+  </div>
+
+  <div class="leads-section">
+    <div class="leads-inner">
+      <div class="leads-title">Belum siap titip sekarang?</div>
+      <div class="leads-sub">Daftarkan nomor WA kamu — kami kabari saat ada promo menarik & penawaran spesial!</div>
+      <div class="leads-form-row">
+        <input type="text" class="leads-input" id="leadsNama" placeholder="Nama kamu" oninput="this.style.outline='none'">
+        <input type="text" class="leads-input" id="leadsWa" placeholder="Nomor WhatsApp" oninput="this.style.outline='none'">
+        <button class="leads-btn" onclick="simpanLeadsForm()">Kabari Saya 🔔</button>
+      </div>
+      <div class="leads-note">Tidak akan di-spam. Hanya info promo & penawaran menarik dari NitipBox.</div>
+      <div class="leads-success" id="leadsSuccess">✅ Terima kasih! Kami akan menghubungimu saat ada promo menarik 😊</div>
+    </div>
+  </div>
+
+  <div class="benefit-section">
+    <h3>Keuntungan Menggunakan Jasa NitipBox</h3>
+    <div class="benefit-grid">
+      <div class="benefit-item"><div class="benefit-icon">🚚</div><h4>Layanan Jemput Paket</h4><p>Gak perlu repot keluar rumah, kurir sigap kami siap menjemput barang titipan langsung dari depan pintumu.</p></div>
+      <div class="benefit-item"><div class="benefit-icon">🛡️</div><h4>Keamanan Berlapis</h4><p>Area penyimpanan bersih, kering, steril, terpantau kamera CCTV pengawas penuh + 3x Proses Verified Saat Pengambilan Barang.</p></div>
+      <div class="benefit-item"><div class="benefit-icon">💸</div><h4>Skema Diskon Besar</h4><p>Makin lama kamu menitipkan barang, makin murah biayanya dengan potongan hingga 30% untuk durasi bulanan.</p></div>
+      <div class="benefit-item"><div class="benefit-icon">📱</div><h4>Pelacakan Sistem Transparan</h4><p>Pantau langsung tanggal jatuh tempo penyimpananmu secara berkala kapan saja hanya dengan kode booking unik.</p></div>
+    </div>
+  </div>
+
+  <div class="lokasi-section">
+    <h3>📍 Lokasi Point NitipBox</h3>
+    <p class="lokasi-subtitle">Pilih point terdekat dari lokasimu</p>
+    <div class="lokasi-grid" id="lokasiGrid"></div>
+  </div>
+
+  <div class="faq-section">
+    <h3>❓ Pertanyaan yang Sering Ditanyakan</h3>
+    <p class="faq-subtitle">Temukan jawaban cepat di sini, atau hubungi admin jika belum terjawab</p>
+    <div class="faq-categories">
+      <button class="faq-cat-btn active" onclick="filterFaq('semua', this)">🗂 Semua</button>
+      <button class="faq-cat-btn" onclick="filterFaq('layanan', this)">📦 Layanan</button>
+      <button class="faq-cat-btn" onclick="filterFaq('pembayaran', this)">💰 Pembayaran</button>
+      <button class="faq-cat-btn" onclick="filterFaq('antjemput', this)">🚚 Antar/Jemput</button>
+      <button class="faq-cat-btn" onclick="filterFaq('pengambilan', this)">📋 Pengambilan</button>
+    </div>
+    <div class="faq-wrapper">
+      <div class="faq-item" data-cat="layanan">
+        <div class="faq-question" onclick="toggleFaq(this)">Barang apa saja yang bisa dititipkan?<span class="faq-icon">+</span></div>
+        <div class="faq-answer">Semua jenis barang dari ukuran kecil hingga ekstra besar. Ada 5 kategori ukuran:<ul><li><strong>S (Kecil)</strong> — tas kecil, dokumen, elektronik kecil</li><li><strong>M (Sedang)</strong> — Elektronic Sedang (Rice cooker, air fryer,TV 24 inch kebawah), ransel besar, kardus sedang</li><li><strong>L (Besar)</strong> — Koper besar, kardus besar, sepeda lipat, TV 32 Inch Keatas</li><li><strong>XL (Ekstra)</strong> — Sepeda gunung, motor standard, Kursi, Lemari plastik/kayu 1pintu, furniture, barang pindahan</li><li><strong>XXL+ (Super)</strong> — Motor Gede, Gabungan Furniture & barang pindahan dll </li></ul></div>
+      </div>
+      <div class="faq-item" data-cat="layanan">
+        <div class="faq-question" onclick="toggleFaq(this)">Berapa lama minimal penitipan?<span class="faq-icon">+</span></div>
+        <div class="faq-answer">Minimal <strong>1 hari</strong>, tidak ada batas maksimal. Makin lama titip, makin hemat karena ada diskon paket mingguan (hemat 15%) dan bulanan (hemat 30%).</div>
+      </div>
+      <div class="faq-item" data-cat="layanan">
+        <div class="faq-question" onclick="toggleFaq(this)">Apakah barang saya aman di NitipBox?<span class="faq-icon">+</span></div>
+        <div class="faq-answer">Keamanan adalah prioritas kami. Setiap barang yang masuk:<ul><li>Difoto dokumentasi dari semua sisi sebelum disimpan</li><li>Diberi kode unik <strong>NTB-XXXX</strong> sebagai identitas</li><li>Disimpan di area khusus yang bersih dan terpantau</li><li>Diverifikasi 3x saat proses pengambilan</li></ul></div>
+      </div>
+      <div class="faq-item" data-cat="pembayaran">
+        <div class="faq-question" onclick="toggleFaq(this)">Bagaimana sistem pembayarannya?<span class="faq-icon">+</span></div>
+        <div class="faq-answer">Ada 2 pilihan:<ul><li><strong>Lunas di muka</strong> — bayar penuh saat antar barang</li><li><strong>DP 30% di awal</strong> — sisanya dilunasi saat pengambilan barang</li></ul></div>
+      </div>
+      <div class="faq-item" data-cat="pembayaran">
+        <div class="faq-question" onclick="toggleFaq(this)">Metode pembayaran apa yang diterima?<span class="faq-icon">+</span></div>
+        <div class="faq-answer">Kami menerima:<ul><li>💳 Transfer bank</li><li>📱 QRIS (semua e-wallet & mobile banking)</li><li>💵 Tunai</li></ul></div>
+      </div>
+      <div class="faq-item" data-cat="antjemput">
+        <div class="faq-question" onclick="toggleFaq(this)">Apakah ada layanan antar/jemput barang?<span class="faq-icon">+</span></div>
+        <div class="faq-answer">Ada! Saat ini tersedia untuk ukuran <strong>S, M, dan L</strong>. Untuk XL dan XXL+ belum tersedia <span class="tag-soon">Segera Hadir</span><div class="tarif-box"><div class="tarif-row"><span>Antar ATAU Jemput (salah satu)</span><span><strong>Rp 3.000/km</strong></span></div><div class="tarif-row"><span>Antar DAN Jemput (keduanya)</span><span><strong>Rp 5.000/km</strong></span></div></div>Tarif dihitung dari titik lokasi kamu ke NitipBox.</div>
+      </div>
+      <div class="faq-item" data-cat="pengambilan">
+        <div class="faq-question" onclick="toggleFaq(this)">Bagaimana cara mengambil barang?<span class="faq-icon">+</span></div>
+        <div class="faq-answer">Untuk pengambilan sendiri, siapkan:<ul class="step-list"><li><div class="step-num">1</div><div>Kode booking (contoh: NTB-0001)</div></li><li><div class="step-num">2</div><div>Bukti pembayaran (nota / kwitansi / screenshot transfer)</div></li><li><div class="step-num">3</div><div>6 angka terakhir nomor identitas (KTP/SIM)</div></li></ul></div>
+      </div>
+      <div class="faq-item" data-cat="pengambilan">
+        <div class="faq-question" onclick="toggleFaq(this)">Bolehkah orang lain mengambil barang atas nama saya?<span class="faq-icon">+</span></div>
+        <div class="faq-answer">Boleh! Dengan membawa:<ul><li>📄 Surat kuasa dari pemilik barang</li><li>🪪 Foto identitas pemilik/penitip barang (KTP/SIM)</li><li>🪪 Foto identitas pribadi pengambil</li></ul></div>
+      </div>
+    </div>
+    <div class="faq-still-confused">
+      <p>Masih ada pertanyaan yang belum terjawab? 😊</p>
+      <a href="https://wa.me/6285174271037?text=Halo%20NitipBox!%20Saya%20ingin%20bertanya%20tentang%20layanan%20penitipan." class="btn-wa-faq" target="_blank">💬 Tanya Langsung ke Admin</a>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-brand">NitipBox</div>
+    <div class="footer-tagline">Titip Aman, Hati Tenang</div>
+    <div class="footer-links">
+      <a href="https://nitipbox.my.id">Beranda</a>
+      <a href="#" onclick="bukaSK();return false;">Syarat & Ketentuan</a>
+      <a href="https://wa.me/6285174271037">Hubungi Kami</a>
+      <a href="https://maps.app.goo.gl/nitipbox">Google Maps</a>
+    </div>
+    <div class="footer-copy">© 2026 NitipBox. Semua hak dilindungi.</div>
+  </div>
+
+  <a href="https://wa.me/6285174271037?text=Halo%20NitipBox,%20saya%20ingin%20bertanya%20tentang%20layanan%20penitipan" class="wa-float" target="_blank"><span>💬</span> Chat Admin</a>
+
+  <div class="sk-modal-overlay" id="skModal">
+    <div class="sk-modal">
+      <div class="sk-modal-header">
+        <h2>📋 Syarat & Ketentuan NitipBox</h2>
+        <button class="sk-modal-close" onclick="tutupSK()">✕</button>
+      </div>
+      <div class="sk-modal-body">
+        <div class="highlight">Dengan melakukan booking, kamu menyetujui seluruh syarat dan ketentuan berikut. Harap baca dengan seksama sebelum melanjutkan.</div>
+        <h3>1. Layanan NitipBox</h3>
+        <ul>
+          <li>NitipBox menyediakan jasa penyimpanan barang harian dengan 5 kategori ukuran: S, M, L, XL, dan XXL+</li>
+          <li>Penitipan minimal 1 hari, tidak ada batas maksimal</li>
+          <li>Pelanggan bertanggung jawab memastikan isi barang yang dititipkan sesuai dengan informasi yang diberikan saat booking</li>
+          <li>Setiap barang yang diterima akan didokumentasikan dalam bentuk foto dan dicatat kondisi fisiknya sebagai referensi selama masa penitipan</li>
+          <li>Setelah Didokumentaikan Setiap barang yang masuk akan diberi kode unik NTB-XXXX</li>
+        </ul>
+        <h3>2. Pembayaran</h3>
+        <ul>
+          <li>Bisa dilunasi penuh di muka, atau DP minimal 30% saat barang diantar</li>
+          <li>Pelunasan wajib diselesaikan sebelum barang diserahkan kembali</li>
+          <li>Metode pembayaran: Transfer bank, QRIS, atau Tunai</li>
+          <li>Paket mingguan hemat 15%, paket bulanan hemat 30%</li>
+        </ul>
+        <h3>3. Keterlambatan Pengambilan</h3>
+        <ul>
+          <li>Lebih dari 24 jam / H+1 setelah jatuh tempo: dikenakan tambahan tarif harian</li>
+          <li>Lebih dari 7 hari setelah jatuh tempo: dikenakan tambahan tarif 85% dari tarif harian per harinya</li>
+          <li>Apabila setelah 30 hari sejak jatuh tempo pelanggan tidak dapat dihubungi, NitipBox berhak mengambil tindakan administratif yang diperlukan untuk menutup biaya penyimpanan yang terus berjalan.</li>
+        </ul>
+        <h3>4. Barang yang Tidak Diterima</h3>
+        <ul>
+          <li>Senjata, Bahan kimia berbahaya, makanan/minuman, hewan hidup, Barang mudah terbakar, Barang mudah meledak, Narkotika, Uang tunai, Perhiasan bernilai tinggi, Dokumen negara yang bersifat rahasia</li>
+          <li>NitipBox berhak menolak barang yang dianggap tidak sesuai tanpa penjelasan lebih lanjut</li>
+        </ul>
+        <h3>5. Tanggung Jawab NitipBox</h3>
+        <ul>
+          <li>NitipBox bertanggung jawab atas kerusakan atau kehilangan akibat kelalaian NitipBox</li>
+          <li>NitipBox TIDAK bertanggung jawab atas kerusakan yang sudah ada sebelum barang diterima (terdokumentasi di foto)</li>
+          <li>NitipBox TIDAK bertanggung jawab atas kejadian force majeure (bencana alam, kebakaran, dll) akan tetapi NitipBox akan tetap berupaya melakukan pengamanan dan penyelamatan barang sesuai kemampuan yang tersedia.</li>
+          <li>Nilai ganti rugi maksimal sebesar nilai pasar wajar barang saat kejadian, berdasarkan bukti kepemilikan, bukti pembelian, atau referensi harga pasar yang dapat diverifikasi.</li>
+        </ul>
+        <h3>6. Pengambilan Barang</h3>
+        <ul>
+          <li>Wajib menunjukkan: kode booking + bukti pembayaran + 6 digit terakhir nomor identitas</li>
+          <li>Pengambilan oleh orang lain: wajib membawa surat kuasa + foto identitas pemilik + foto identitas pengambil</li>
+          <li>Barang hanya diserahkan setelah pembayaran lunas</li>
+        </ul>
+        <h3>7. Layanan Antar/Jemput</h3>
+        <ul>
+          <li>Tersedia untuk ukuran S, M, dan L. Mohon Maaf Untuk Ukuran XL dan XXL+ belum tersedia</li>
+          <li>Tarif antar ATAU jemput: Rp 3.000/km dari titik lokasi</li>
+          <li>Tarif antar DAN jemput: Rp 5.000/km dari titik lokasi</li>
+        </ul>
+        <h3>8. Privasi Data</h3>
+        <ul>
+          <li>Data pribadi pelanggan (nama, WA, identitas) hanya digunakan untuk keperluan operasional NitipBox</li>
+          <li>Data tidak akan dibagikan kepada pihak ketiga tanpa persetujuan pelanggan</li>
+        </ul>
+        <div class="highlight">Dengan menyetujui S&K ini, kamu mengakui telah membaca dan memahami seluruh ketentuan di atas. Perjanjian penitipan lengkap akan dikirimkan via WhatsApp sebelum barang diantar.</div>
+      </div>
+      <div class="sk-modal-footer">
+        <button class="sk-btn-setuju" onclick="setujuSK()">✅ Saya Mengerti & Setuju</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
