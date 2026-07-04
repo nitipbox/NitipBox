@@ -201,6 +201,15 @@
           </div>
         </div>
 
+        <div class="filter-bar">
+          <select id="filterCabangKeuangan">
+            <option value="semua">Semua cabang</option>
+            <option value="Surabaya">Surabaya</option>
+            <option value="Sidoarjo">Sidoarjo</option>
+            <option value="Sidoarjo 2 (Back Up)">Sidoarjo 2</option>
+          </select>
+        </div>
+
         <div class="stat-grid">
           <div class="stat-card stat-tosca">
             <span class="stat-label">Pemasukan bulan ini</span>
@@ -215,7 +224,7 @@
             <span id="kLabaBulan" class="stat-value">–</span>
           </div>
           <div class="stat-card" style="background:var(--tosca-dark)">
-            <span class="stat-label" style="color:#9FE1CB">Saldo kas saat ini</span>
+            <span id="kSaldoLabel" class="stat-label" style="color:#9FE1CB">Saldo kas saat ini</span>
             <span id="kSaldoKas" class="stat-value" style="color:#fff">–</span>
           </div>
         </div>
@@ -249,7 +258,7 @@
         <p class="panel-subtitle">Riwayat transaksi</p>
         <div class="list-table">
           <div class="list-row keuangan-row keuangan-head">
-            <span>Tanggal</span><span>Keterangan</span><span>Kategori</span><span>Masuk</span><span>Keluar</span><span>Saldo</span>
+            <span>Tanggal</span><span>Keterangan</span><span>Kategori</span><span>Masuk</span><span>Keluar</span><span>Saldo</span><span>Bukti</span>
           </div>
           <div id="riwayatTransaksiBody">
             <p class="empty-state">Memuat riwayat transaksi...</p>
@@ -277,6 +286,15 @@
           <input type="text" id="pengeluaranKeterangan" placeholder="Contoh: Beli plastik & label" required>
         </div>
         <div class="edit-field">
+          <label>Cabang / Point</label>
+          <select id="pengeluaranLokasi">
+            <option value="">Umum (semua cabang)</option>
+            <option value="Surabaya">Surabaya</option>
+            <option value="Sidoarjo">Sidoarjo</option>
+            <option value="Sidoarjo 2 (Back Up)">Sidoarjo 2</option>
+          </select>
+        </div>
+        <div class="edit-field">
           <label>Kategori</label>
           <select id="pengeluaranKategori" required>
             <option value="__baru__">＋ Tambah kategori baru...</option>
@@ -290,9 +308,14 @@
           <label>Jumlah (Rp)</label>
           <input type="number" id="pengeluaranJumlah" min="0" required>
         </div>
+        <div class="edit-field">
+          <label>Foto bukti nota / transfer (wajib)</label>
+          <input type="file" id="pengeluaranBukti" accept="image/*" capture="environment" required>
+          <img id="pengeluaranBuktiPreview" style="display:none;max-width:100%;border-radius:8px;margin-top:8px">
+        </div>
         <div class="edit-modal-actions">
           <button type="button" id="btnBatalPengeluaran" class="btn btn-ghost">Batal</button>
-          <button type="submit" class="btn btn-tosca-solid">Simpan pengeluaran</button>
+          <button type="submit" id="btnSimpanPengeluaran" class="btn btn-tosca-solid">Simpan pengeluaran</button>
         </div>
       </form>
     </div>
