@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NitipBox Admin</title>
 <link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
@@ -13,8 +14,13 @@
 
   <!-- TOP BAR MOBILE -->
   <div id="mobileTopbar" class="mobile-topbar">
-    <span class="mobile-topbar-brand">NitipBox admin</span>
-    <button id="btnLogoutMobile" class="mobile-topbar-logout" aria-label="Keluar">⏻</button>
+    <div>
+      <p class="mobile-topbar-eyebrow">NitipBox admin</p>
+      <h2 id="mobileTopbarTitle" class="mobile-topbar-title">Verifikasi orderan</h2>
+    </div>
+    <button id="btnLogoutMobile" class="mobile-topbar-avatar" aria-label="Keluar / profil">
+      <i class="ti ti-user" aria-hidden="true"></i>
+    </button>
   </div>
 
   <!-- LOGIN SCREEN -->
@@ -35,33 +41,34 @@
     <div class="sidebar">
       <p class="sidebar-brand">NitipBox admin</p>
       <button class="nav-item active" data-tab="verifikasi">
-        <span class="nav-icon">⏳</span>
+        <i class="ti ti-hourglass nav-icon" aria-hidden="true"></i>
         <span>Verifikasi orderan</span>
         <span id="badgeVerifikasi" class="nav-badge" style="display:none">0</span>
       </button>
       <button class="nav-item" data-tab="listorderan">
-        <span class="nav-icon">📋</span>
+        <i class="ti ti-clipboard-list nav-icon" aria-hidden="true"></i>
         <span>List orderan</span>
       </button>
       <button class="nav-item" data-tab="label">
-        <span class="nav-icon">🏷️</span>
+        <i class="ti ti-tag nav-icon" aria-hidden="true"></i>
         <span>Cetak label</span>
       </button>
       <button class="nav-item" data-tab="analisis">
-        <span class="nav-icon">📊</span>
+        <i class="ti ti-chart-bar nav-icon" aria-hidden="true"></i>
         <span>Analisis orderan</span>
       </button>
       <button class="nav-item" data-tab="keuangan">
-        <span class="nav-icon">💰</span>
+        <i class="ti ti-wallet nav-icon" aria-hidden="true"></i>
         <span>Keuangan</span>
       </button>
       <button class="nav-item" data-tab="galeri">
-        <span class="nav-icon">🖼️</span>
+        <i class="ti ti-photo nav-icon" aria-hidden="true"></i>
         <span>Galeri</span>
       </button>
       <div class="sidebar-footer">
+        <div class="sidebar-avatar"><i class="ti ti-user" aria-hidden="true"></i></div>
         <span id="adminEmail" class="sidebar-email"></span>
-        <button id="btnLogout" class="btn-logout">Keluar</button>
+        <button id="btnLogout" class="btn-logout" aria-label="Keluar"><i class="ti ti-logout" aria-hidden="true"></i></button>
       </div>
     </div>
 
@@ -105,6 +112,7 @@
           <div class="panel-pills">
             <span id="pillBerjalan" class="pill pill-tosca">Berjalan –</span>
             <span id="pillTempo" class="pill pill-danger">Jatuh tempo –</span>
+            <span id="pillDiambil" class="pill pill-neutral">Sudah diambil –</span>
           </div>
         </div>
 
@@ -120,6 +128,7 @@
             <option value="semua">Semua status</option>
             <option value="berjalan">Order berjalan</option>
             <option value="tempo">Order jatuh tempo</option>
+            <option value="diambil">Sudah diambil</option>
           </select>
           <select id="filterUrutan">
             <option value="terbaru">Order terbaru</option>
