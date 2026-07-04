@@ -51,9 +51,11 @@ document.getElementById('btnLoginGoogle').addEventListener('click', function() {
   });
 });
 
-document.getElementById('btnLogout').addEventListener('click', function() {
+document.getElementById('btnLogout').addEventListener('click', prosesLogout);
+document.getElementById('btnLogoutMobile').addEventListener('click', prosesLogout);
+function prosesLogout() {
   db.auth.signOut().then(function() { window.location.reload(); });
-});
+}
 
 async function cekSesiLogin() {
   const { data: { session } } = await db.auth.getSession();
@@ -85,10 +87,12 @@ async function cekSesiLogin() {
 function tampilkanLogin() {
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('appShell').style.display = 'none';
+  document.body.classList.remove('logged-in');
 }
 function tampilkanDashboard() {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appShell').style.display = 'flex';
+  document.body.classList.add('logged-in');
   siapkanAudio();
 }
 
@@ -98,12 +102,17 @@ function tampilkanDashboard() {
 document.querySelectorAll('.nav-item[data-tab]').forEach(function(btn) {
   btn.addEventListener('click', function() {
     if (btn.disabled) return;
-    document.querySelectorAll('.nav-item').forEach(function(b) { b.classList.remove('active'); });
-    document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
-    btn.classList.add('active');
-    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    pindahTab(btn.dataset.tab);
   });
 });
+
+function pindahTab(namaTab) {
+  document.querySelectorAll('.nav-item').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  var navBtn = document.querySelector('.nav-item[data-tab="' + namaTab + '"]');
+  if (navBtn) navBtn.classList.add('active');
+  document.getElementById('tab-' + namaTab).classList.add('active');
+}
 
 /* =============================================
    HELPER
@@ -291,6 +300,7 @@ var _listOrderanCache = [];
 document.getElementById('filterWilayah').addEventListener('change', renderListOrderan);
 document.getElementById('filterStatus').addEventListener('change', renderListOrderan);
 document.getElementById('filterUrutan').addEventListener('change', renderListOrderan);
+document.getElementById('searchListOrderan').addEventListener('input', renderListOrderan);
 
 async function muatListOrderan() {
   const { data } = await db.from('titipan').select('*').eq('status', 'aktif').order('created_at', { ascending: false });
@@ -305,6 +315,7 @@ function renderListOrderan() {
   var wilayahFilter = document.getElementById('filterWilayah').value;
   var statusFilter = document.getElementById('filterStatus').value;
   var urutanFilter = document.getElementById('filterUrutan').value;
+  var kataKunci = document.getElementById('searchListOrderan').value.trim().toLowerCase();
 
   // hitung status jatuh tempo tiap baris dulu
   var data = _listOrderanCache.map(function(row) {
@@ -319,6 +330,16 @@ function renderListOrderan() {
   var jumlahTempoTotal = data.filter(function(r) { return r._jatuhTempo; }).length;
   document.getElementById('pillBerjalan').textContent = 'Berjalan ' + jumlahBerjalanTotal;
   document.getElementById('pillTempo').textContent = 'Jatuh tempo ' + jumlahTempoTotal;
+
+  // terapkan pencarian
+  if (kataKunci) {
+    data = data.filter(function(r) {
+      return (r.nama || '').toLowerCase().indexOf(kataKunci) !== -1 ||
+             (r.kode || '').toLowerCase().indexOf(kataKunci) !== -1 ||
+             (r.deskripsi || '').toLowerCase().indexOf(kataKunci) !== -1 ||
+             (r.wa || '').toLowerCase().indexOf(kataKunci) !== -1;
+    });
+  }
 
   // terapkan filter
   if (wilayahFilter !== 'semua') data = data.filter(function(r) { return r.lokasi === wilayahFilter; });
@@ -960,12 +981,12 @@ function renderTrenOrderChart(rows) {
 var _galeriKodeAktif = '';
 var _galeriTipeAktif = 'checkin';
 
-document.getElementById('btnCariGaleri').addEventListener('click', cariGaleri);
+document.getElementById('btnCariGaleri').addEventListener('click', function() { cariGaleri(); });
 document.getElementById('galeriKodeInput').addEventListener('keydown', function(e) {
   if (e.key === 'Enter') cariGaleri();
 });
 
-async function cariGaleri() {
+async function cariGaleri(tipeAwal) {
   var kode = document.getElementById('galeriKodeInput').value.trim().toUpperCase();
   var msg = document.getElementById('galeriSearchMsg');
   msg.textContent = '';
@@ -979,10 +1000,17 @@ async function cariGaleri() {
   }
 
   _galeriKodeAktif = kode;
-  _galeriTipeAktif = 'checkin';
-  document.querySelectorAll('.galeri-tab-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.tipe === 'checkin'); });
+  _galeriTipeAktif = tipeAwal || 'checkin';
+  document.querySelectorAll('.galeri-tab-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.tipe === _galeriTipeAktif); });
   document.getElementById('galeriArea').style.display = 'block';
   muatGaleriGrid();
+}
+
+// dipanggil dari alur scan checkout — buka tab Galeri langsung dengan kode & tipe tertentu
+function bukaGaleriUntukKode(kode, tipe) {
+  pindahTab('galeri');
+  document.getElementById('galeriKodeInput').value = kode;
+  cariGaleri(tipe);
 }
 
 document.querySelectorAll('.galeri-tab-btn').forEach(function(btn) {
@@ -1008,11 +1036,35 @@ async function muatGaleriGrid() {
 
   var uploadTile = document.createElement('div');
   uploadTile.className = 'galeri-upload-tile';
-  uploadTile.innerHTML = '＋<input type="file" accept="image/*" capture="environment" id="galeriUploadInput">';
+  uploadTile.innerHTML = '＋<input type="file" accept="image/*" id="galeriUploadInput">';
   grid.appendChild(uploadTile);
 
   document.getElementById('galeriUploadInput').addEventListener('change', uploadFotoGaleri);
+
+  // banner & tombol konfirmasi khusus tab checkout
+  var jumlahFoto = (data || []).length;
+  var banner = document.getElementById('galeriCheckoutBanner');
+  var btnKonfirmasi = document.getElementById('btnKonfirmasiCheckout');
+  if (_galeriTipeAktif === 'checkout') {
+    banner.style.display = jumlahFoto === 0 ? 'block' : 'none';
+    btnKonfirmasi.style.display = 'block';
+    btnKonfirmasi.disabled = jumlahFoto === 0;
+    btnKonfirmasi.textContent = jumlahFoto === 0 ? '✅ Konfirmasi Checkout Selesai (upload foto dulu)' : '✅ Konfirmasi Checkout Selesai';
+  } else {
+    banner.style.display = 'none';
+    btnKonfirmasi.style.display = 'none';
+  }
 }
+
+document.getElementById('btnKonfirmasiCheckout').addEventListener('click', async function() {
+  if (this.disabled) return;
+  if (!confirm('Tandai order ' + _galeriKodeAktif + ' sebagai selesai checkout?')) return;
+  await db.from('titipan').update({ status: 'diambil' }).eq('kode', _galeriKodeAktif);
+  alert('Checkout selesai dicatat untuk ' + _galeriKodeAktif + '.');
+  document.getElementById('galeriArea').style.display = 'none';
+  document.getElementById('galeriKodeInput').value = '';
+  muatListOrderan();
+});
 
 async function uploadFotoGaleri(e) {
   var file = e.target.files[0];
@@ -1042,6 +1094,68 @@ document.getElementById('btnHapusSemuaFoto').addEventListener('click', async fun
   await db.from('galeri_foto').delete().eq('kode', _galeriKodeAktif);
   muatGaleriGrid();
 });
+
+/* =============================================
+   SCANNER QR — CHECKOUT
+   ============================================= */
+var _html5QrInstance = null;
+
+document.getElementById('btnScanCheckout').addEventListener('click', bukaScannerModal);
+document.getElementById('btnTutupScanner').addEventListener('click', tutupScannerModal);
+document.getElementById('scannerModalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) tutupScannerModal();
+});
+document.getElementById('btnToggleManual').addEventListener('click', function() {
+  var wrap = document.getElementById('wrapManualKode');
+  wrap.style.display = wrap.style.display === 'block' ? 'none' : 'block';
+});
+document.getElementById('btnKirimManualKode').addEventListener('click', function() {
+  var kode = document.getElementById('manualKodeInput').value.trim().toUpperCase();
+  if (!kode) return;
+  prosesKodeCheckout(kode);
+});
+
+function bukaScannerModal() {
+  document.getElementById('scannerMsg').textContent = '';
+  document.getElementById('manualKodeInput').value = '';
+  document.getElementById('wrapManualKode').style.display = 'none';
+  document.getElementById('scannerModalOverlay').classList.add('show');
+
+  _html5QrInstance = new Html5Qrcode('qrReaderBox');
+  _html5QrInstance.start(
+    { facingMode: 'environment' },
+    { fps: 10, qrbox: 220 },
+    function(decodedText) {
+      prosesKodeCheckout(decodedText.trim().toUpperCase());
+    },
+    function() { /* frame tanpa QR terdeteksi, biarkan */ }
+  ).catch(function(err) {
+    document.getElementById('scannerMsg').textContent = 'Kamera tidak bisa diakses. Gunakan input manual di bawah.';
+    document.getElementById('wrapManualKode').style.display = 'block';
+    console.error('Gagal membuka kamera:', err);
+  });
+}
+
+function tutupScannerModal() {
+  document.getElementById('scannerModalOverlay').classList.remove('show');
+  if (_html5QrInstance) {
+    _html5QrInstance.stop().then(function() { _html5QrInstance.clear(); }).catch(function() {});
+    _html5QrInstance = null;
+  }
+}
+
+async function prosesKodeCheckout(kode) {
+  var msg = document.getElementById('scannerMsg');
+  const { data } = await db.from('titipan').select('kode, status').eq('kode', kode).maybeSingle();
+
+  if (!data) { msg.textContent = 'Kode booking tidak ditemukan. Coba scan ulang.'; return; }
+  if (data.status === 'diambil') { msg.textContent = 'Pesanan ini sudah checkout/diambil pemilik.'; return; }
+  if (data.status === 'booking') { msg.textContent = 'Order ini belum dikonfirmasi admin, tidak bisa checkout.'; return; }
+  if (data.status === 'ditolak') { msg.textContent = 'Order ini sudah ditolak, tidak bisa checkout.'; return; }
+
+  tutupScannerModal();
+  bukaGaleriUntukKode(data.kode, 'checkout');
+}
 
 /* =============================================
    START
