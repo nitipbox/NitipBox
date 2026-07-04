@@ -309,7 +309,7 @@ body {
 .label-col-left { flex: 0 0 42%; display: flex; flex-direction: column; align-items: center; }
 .label-eyebrow { text-align: center; font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em; margin: 0; }
 .label-kode { text-align: center; font-size: 19px; font-weight: bold; color: var(--tosca-dark); letter-spacing: 1.5px; margin: 2px 0 10px; }
-.label-qr { display: block; margin: 0 auto; }
+.label-qr { display: flex; justify-content: center; width: 90px; height: 90px; margin: 0 auto; }
 .label-col-right { flex: 1; border-left: 1px dashed var(--border); padding-left: 14px; display: flex; flex-direction: column; justify-content: center; gap: 8px; font-size: 13px; color: var(--text-muted); }
 .label-detail-row { display: flex; justify-content: space-between; gap: 10px; }
 .label-detail-row span:last-child { color: var(--text); font-weight: bold; text-align: right; }
@@ -336,9 +336,8 @@ body {
 
 /* ============ PRINT ============ */
 @media print {
-  body * { visibility: hidden; }
-  .label-print-target, .label-print-target * { visibility: visible; }
-  .label-print-target { position: absolute; top: 0; left: 0; border: none; }
+  body.lagi-print > *:not(#labelPrintTarget) { display: none !important; }
+  #labelPrintTarget { position: fixed; top: 0; left: 0; border: none; }
 }
 
 /* ============ MODAL EDIT ORDERAN ============ */
