@@ -497,21 +497,37 @@ document.getElementById('btnPrintLabel').addEventListener('click', function() {
 
 function cetakElemen(id) {
   var target = document.getElementById(id);
-  var originalParent = target.parentNode;
-  var originalNextSibling = target.nextSibling;
+  var clone = target.cloneNode(true);
 
-  // pindahkan keluar dari struktur dashboard (yg tinggi) biar nggak numpuk banyak halaman kosong
-  document.body.appendChild(target);
-  document.body.classList.add('lagi-print');
+  // ganti kanvas (misal QR code) jadi gambar statis biar ikut kebawa ke jendela print
+  var originalCanvases = target.querySelectorAll('canvas');
+  var cloneCanvases = clone.querySelectorAll('canvas');
+  originalCanvases.forEach(function(cv, i) {
+    if (!cloneCanvases[i]) return;
+    var img = document.createElement('img');
+    img.src = cv.toDataURL('image/png');
+    img.style.width = cv.style.width || (cv.width + 'px');
+    img.style.height = cv.style.height || (cv.height + 'px');
+    cloneCanvases[i].parentNode.replaceChild(img, cloneCanvases[i]);
+  });
 
-  function kembalikan() {
-    document.body.classList.remove('lagi-print');
-    originalParent.insertBefore(target, originalNextSibling);
-    window.removeEventListener('afterprint', kembalikan);
-  }
-  window.addEventListener('afterprint', kembalikan);
+  var pageSizeTag = document.getElementById('printPageSizeStyle');
+  var pageSizeCss = pageSizeTag ? pageSizeTag.textContent : '';
 
-  window.print();
+  var jendela = window.open('', '_blank', 'width=420,height=640');
+  jendela.document.write(
+    '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+    '<link rel="stylesheet" href="admin.css">' +
+    '<style>' + pageSizeCss + ' body{margin:0;padding:18px;background:#fff}</style>' +
+    '</head><body>' + clone.outerHTML + '</body></html>'
+  );
+  jendela.document.close();
+  jendela.onload = function() {
+    setTimeout(function() {
+      jendela.focus();
+      jendela.print();
+    }, 300);
+  };
 }
 
 /* =============================================
@@ -906,26 +922,25 @@ document.getElementById('formPengeluaran').addEventListener('submit', async func
 document.getElementById('btnExportPdf').addEventListener('click', function() {
   var rows = document.getElementById('riwayatTransaksiBody').innerHTML;
   var headHtml = '<div class="list-row keuangan-row keuangan-head"><span>Tanggal</span><span>Keterangan</span><span>Kategori</span><span>Masuk</span><span>Keluar</span><span>Saldo</span><span>Bukti</span></div>';
-
-  var target = document.createElement('div');
-  target.id = 'exportPdfTarget';
-  target.className = 'cetak-target export-pdf-wrap';
-  target.innerHTML =
+  var isiHtml =
     '<h2 style="color:#005a4e">NitipBox — Riwayat Transaksi Keuangan</h2>' +
     '<p style="font-size:12px;color:#888;margin-bottom:14px">Dicetak: ' + new Date().toLocaleString('id-ID') + '</p>' +
     '<div class="list-table">' + headHtml + rows + '</div>';
 
-  document.body.appendChild(target);
-  document.body.classList.add('lagi-print');
-
-  function bersihkan() {
-    document.body.classList.remove('lagi-print');
-    target.remove();
-    window.removeEventListener('afterprint', bersihkan);
-  }
-  window.addEventListener('afterprint', bersihkan);
-
-  window.print();
+  var jendela = window.open('', '_blank', 'width=700,height=700');
+  jendela.document.write(
+    '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+    '<link rel="stylesheet" href="admin.css">' +
+    '<style>body{margin:0;padding:24px;background:#fff}</style>' +
+    '</head><body>' + isiHtml + '</body></html>'
+  );
+  jendela.document.close();
+  jendela.onload = function() {
+    setTimeout(function() {
+      jendela.focus();
+      jendela.print();
+    }, 300);
+  };
 });
 
 /* =============================================
