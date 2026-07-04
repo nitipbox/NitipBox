@@ -1,4 +1,5 @@
-// ⚠️ ISI SAMA PERSIS seperti nilai yang sudah kamu isi di app.js (project Supabase yang sama)
+// ⚠️ Baris SUPABASE_URL sudah diisi sesuai project Supabase NitipBox kamu.
+// Baris SUPABASE_KEY WAJIB kamu isi sendiri dari: Supabase Dashboard > Settings > API > "anon public" key
 const SUPABASE_URL = 'https://tevehzihkqhqmxlrtdhl.supabase.co'
 const SUPABASE_KEY = 'sb_publishable_NMoOIVW_lTA1lMsdkG2x1A_Qj0iRFIu'
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
@@ -43,7 +44,10 @@ function tampilkanToast(pesan) {
    ============================================= */
 document.getElementById('btnLoginGoogle').addEventListener('click', function() {
   siapkanAudio(); // unlock audio dalam gesture user, biar notif nanti boleh bunyi
-  db.auth.signInWithOAuth({ provider: 'google' });
+  db.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + '/admin.html' }
+  });
 });
 
 document.getElementById('btnLogout').addEventListener('click', function() {
