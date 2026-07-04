@@ -136,6 +136,17 @@ function hitungTarif(ukuran, hari) {
   else if ((hari || 1) >= 7) diskon = 0.15;
   return Math.ceil((kotor - kotor * diskon) / 100) * 100;
 }
+function hitungTarifDetail(ukuran, hari) {
+  var tarifHarian = basisTarif[ukuran] || 0;
+  var kotor = tarifHarian * (hari || 1);
+  var persenDiskon = 0;
+  if ((hari || 1) >= 30) persenDiskon = 0.30;
+  else if ((hari || 1) >= 7) persenDiskon = 0.15;
+  var nominalDiskon = kotor * persenDiskon;
+  var total = Math.ceil((kotor - nominalDiskon) / 100) * 100;
+  var dp = Math.ceil((total * 0.30) / 1000) * 1000;
+  return { tarifHarian: tarifHarian, kotor: kotor, persenDiskon: persenDiskon, nominalDiskon: nominalDiskon, total: total, dp: dp };
+}
 
 /* =============================================
    MUAT SEMUA DATA
@@ -325,7 +336,9 @@ function renderListOrderan() {
   }
 
   wrap.innerHTML = '';
+  window._listCache = {};
   data.forEach(function(row) {
+    window._listCache[row.id] = row;
     var aj = labelAntarJemput(row.layanan);
     var tarif = hitungTarif(row.ukuran, row.hari);
     var kodeWilayah = prefixLokasi[row.lokasi] || (row.lokasi || '-');
@@ -343,9 +356,26 @@ function renderListOrderan() {
         : '<span>' + formatTanggalID(row._jt) + '</span>') +
       (row._jatuhTempo
         ? '<span class="badge-mini badge-danger">Jatuh tempo</span>'
-        : '<span class="badge-mini badge-tosca">Berjalan</span>');
+        : '<span class="badge-mini badge-tosca">Berjalan</span>') +
+      '<div class="list-row-actions">' +
+        '<button class="btn btn-icon" title="Nota" data-list-aksi="nota" data-id="' + row.id + '">🧾</button>' +
+        '<button class="btn btn-icon" title="Hapus" data-list-aksi="hapus" data-id="' + row.id + '">🗑️</button>' +
+      '</div>';
     wrap.appendChild(div);
   });
+
+  wrap.querySelectorAll('button[data-list-aksi]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (btn.dataset.listAksi === 'nota') { bukaNotaModal(btn.dataset.id); return; }
+      hapusOrderanAktif(btn.dataset.id);
+    });
+  });
+}
+
+async function hapusOrderanAktif(id) {
+  if (!confirm('Hapus orderan ini secara permanen? Tindakan ini tidak bisa dibatalkan.')) return;
+  await db.from('titipan').delete().eq('id', id);
+  muatListOrderan();
 }
 
 /* =============================================
@@ -422,8 +452,11 @@ function terapkanUkuranLabel() {
 
 document.getElementById('btnPrintLabel').addEventListener('click', function() {
   terapkanUkuranLabel();
+  cetakElemen('labelPrintTarget');
+});
 
-  var target = document.getElementById('labelPrintTarget');
+function cetakElemen(id) {
+  var target = document.getElementById(id);
   var originalParent = target.parentNode;
   var originalNextSibling = target.nextSibling;
 
@@ -439,6 +472,50 @@ document.getElementById('btnPrintLabel').addEventListener('click', function() {
   window.addEventListener('afterprint', kembalikan);
 
   window.print();
+}
+
+/* =============================================
+   MODAL NOTA
+   ============================================= */
+function bukaNotaModal(id) {
+  var row = (window._listCache || {})[id];
+  if (!row) return;
+
+  var d = hitungTarifDetail(row.ukuran, row.hari);
+  var aj = labelAntarJemput(row.layanan);
+  var tglMasuk = new Date(row.tanggal_masuk).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+
+  document.getElementById('notaLokasi').textContent = row.lokasi || '-';
+  document.getElementById('notaKode').textContent = row.kode;
+  document.getElementById('notaTanggal').textContent = tglMasuk;
+  document.getElementById('notaDurasi').textContent = row.hari + ' hari';
+  document.getElementById('notaLayanan').textContent = aj.teks;
+  document.getElementById('notaDasar').textContent = 'Rp ' + d.tarifHarian.toLocaleString('id-ID') + '/hari';
+  document.getElementById('notaDiskon').textContent = d.persenDiskon > 0
+    ? '- Rp ' + d.nominalDiskon.toLocaleString('id-ID') + ' (' + (d.persenDiskon * 100) + '%)'
+    : 'Tidak ada';
+  document.getElementById('notaTotal').textContent = 'Rp ' + d.total.toLocaleString('id-ID');
+  document.getElementById('notaDp').textContent = 'Rp ' + d.dp.toLocaleString('id-ID');
+
+  var qrWrap = document.getElementById('notaQR');
+  qrWrap.innerHTML = '';
+  try {
+    new QRCode(qrWrap, { text: row.kode, width: 110, height: 110, correctLevel: QRCode.CorrectLevel.M });
+  } catch (err) {
+    console.error('Gagal membuat QR nota:', err);
+  }
+
+  document.getElementById('notaModalOverlay').classList.add('show');
+}
+function tutupNotaModal() {
+  document.getElementById('notaModalOverlay').classList.remove('show');
+}
+document.getElementById('btnTutupNota').addEventListener('click', tutupNotaModal);
+document.getElementById('notaModalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) tutupNotaModal();
+});
+document.getElementById('btnCetakNota').addEventListener('click', function() {
+  cetakElemen('notaPrintTarget');
 });
 
 /* =============================================
