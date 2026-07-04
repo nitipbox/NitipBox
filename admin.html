@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NitipBox Admin</title>
 <link rel="stylesheet" href="admin.css">
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
@@ -175,7 +175,7 @@
                 <div class="label-col-left">
                   <p class="label-eyebrow">Kode label</p>
                   <p id="labelKode" class="label-kode">NTB-0000</p>
-                  <canvas id="labelQR" class="label-qr"></canvas>
+                  <div id="labelQR" class="label-qr"></div>
                 </div>
                 <div class="label-col-right">
                   <div class="label-detail-row"><span>Nama</span><span id="labelNama">–</span></div>
