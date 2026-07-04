@@ -146,6 +146,7 @@ body {
 .pill { font-size: 12px; font-weight: bold; padding: 5px 14px; border-radius: 20px; }
 .pill-tosca { background: var(--tosca-bg); color: var(--tosca-dark); }
 .pill-danger { background: var(--danger-bg); color: var(--danger); }
+.pill-neutral { background: var(--bg-light); color: var(--text-muted); }
 
 /* ============ STAT CARDS (fixed alignment) ============ */
 .stat-grid {
