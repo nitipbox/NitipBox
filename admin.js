@@ -497,12 +497,22 @@ function cetakElemen(id) {
     cloneCanvases[i].parentNode.replaceChild(img, cloneCanvases[i]);
   });
 
-  // Label & Nota sekarang 100% inline style, jadi tidak butuh CSS eksternal apa pun.
-  // Cukup reset margin body biar rapi pas print.
+  var pageCss, bodyPadding;
+  if (id === 'labelPrintTarget') {
+    // label thermal: lebar pasti 50mm, tinggi menyesuaikan isi, tanpa margin yang bisa motong
+    clone.style.width = '50mm';
+    clone.style.boxSizing = 'border-box';
+    pageCss = '@page{size:50mm auto;margin:0}';
+    bodyPadding = '0';
+  } else {
+    pageCss = '@page{margin:8mm}';
+    bodyPadding = '18px';
+  }
+
   var jendela = window.open('', '_blank', 'width=420,height=640');
   jendela.document.write(
     '<!DOCTYPE html><html><head><meta charset="utf-8">' +
-    '<style>body{margin:0;padding:18px;background:#fff}@page{margin:8mm}</style>' +
+    '<style>body{margin:0;padding:' + bodyPadding + ';background:#fff}' + pageCss + '</style>' +
     '</head><body>' + clone.outerHTML + '</body></html>'
   );
   jendela.document.close();
