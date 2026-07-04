@@ -45,10 +45,9 @@
         <span>Analisis orderan</span>
         <span class="nav-soon">Segera</span>
       </button>
-      <button class="nav-item nav-item-soon" data-tab="keuangan" disabled>
+      <button class="nav-item" data-tab="keuangan">
         <span class="nav-icon">💰</span>
         <span>Keuangan</span>
-        <span class="nav-soon">Segera</span>
       </button>
       <button class="nav-item nav-item-soon" data-tab="galeri" disabled>
         <span class="nav-icon">🖼️</span>
@@ -192,6 +191,110 @@
         </div>
       </section>
 
+      <!-- TAB: KEUANGAN -->
+      <section id="tab-keuangan" class="tab-panel">
+        <div class="panel-head">
+          <h2>Keuangan</h2>
+          <div style="display:flex;gap:8px">
+            <button id="btnTambahPengeluaran" class="btn btn-ghost">＋ Tambah pengeluaran</button>
+            <button id="btnExportPdf" class="btn btn-tosca-solid">⬇ Export PDF</button>
+          </div>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-card stat-tosca">
+            <span class="stat-label">Pemasukan bulan ini</span>
+            <span id="kPemasukanBulan" class="stat-value">–</span>
+          </div>
+          <div class="stat-card stat-alert">
+            <span class="stat-label">Pengeluaran bulan ini</span>
+            <span id="kPengeluaranBulan" class="stat-value">–</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Laba bersih bulan ini</span>
+            <span id="kLabaBulan" class="stat-value">–</span>
+          </div>
+          <div class="stat-card" style="background:var(--tosca-dark)">
+            <span class="stat-label" style="color:#9FE1CB">Saldo kas saat ini</span>
+            <span id="kSaldoKas" class="stat-value" style="color:#fff">–</span>
+          </div>
+        </div>
+
+        <p class="panel-subtitle">Ringkasan laba & pajak</p>
+        <div class="pajak-table">
+          <div class="pajak-row pajak-head">
+            <span></span><span>Bulan ini</span><span>Tahun berjalan</span>
+          </div>
+          <div class="pajak-row">
+            <span>Omzet (pendapatan kotor)</span><span id="pOmzetBulan">–</span><span id="pOmzetTahun">–</span>
+          </div>
+          <div class="pajak-row">
+            <span>Total beban operasional</span><span id="pBebanBulan">–</span><span id="pBebanTahun">–</span>
+          </div>
+          <div class="pajak-row pajak-highlight">
+            <span>Laba bersih</span><span id="pLabaBulan">–</span><span id="pLabaTahun">–</span>
+          </div>
+          <div class="pajak-row pajak-dashed">
+            <span>Estimasi PPh Final (0,5% × omzet)</span><span id="pPphBulan">–</span><span id="pPphTahun">–</span>
+          </div>
+        </div>
+        <p class="pajak-disclaimer">*Estimasi umum berdasarkan PP 20/2026 untuk omzet di bawah Rp4,8 miliar/tahun. Bukan pengganti konsultasi resmi ke akuntan/konsultan pajak.</p>
+
+        <p class="panel-subtitle">Tren 7 hari terakhir</p>
+        <div class="chart-box">
+          <svg id="trenChart" viewBox="0 0 560 120" style="width:100%;height:110px"></svg>
+          <div class="chart-legend"><span class="legend-tosca">▬ Pemasukan</span><span class="legend-danger">┄ Pengeluaran</span></div>
+        </div>
+
+        <p class="panel-subtitle">Riwayat transaksi</p>
+        <div class="list-table">
+          <div class="list-row keuangan-row keuangan-head">
+            <span>Tanggal</span><span>Keterangan</span><span>Kategori</span><span>Masuk</span><span>Keluar</span><span>Saldo</span>
+          </div>
+          <div id="riwayatTransaksiBody">
+            <p class="empty-state">Memuat riwayat transaksi...</p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- MODAL TAMBAH PENGELUARAN -->
+  <div id="pengeluaranModalOverlay" class="edit-modal-overlay">
+    <div class="edit-modal">
+      <div class="edit-modal-head">
+        <span>Tambah pengeluaran</span>
+        <button id="btnTutupPengeluaran" class="edit-modal-close" aria-label="Tutup">✕</button>
+      </div>
+      <form id="formPengeluaran" class="edit-modal-body">
+        <div class="edit-field">
+          <label>Tanggal</label>
+          <input type="date" id="pengeluaranTanggal" required>
+        </div>
+        <div class="edit-field">
+          <label>Keterangan</label>
+          <input type="text" id="pengeluaranKeterangan" placeholder="Contoh: Beli plastik & label" required>
+        </div>
+        <div class="edit-field">
+          <label>Kategori</label>
+          <select id="pengeluaranKategori" required>
+            <option value="__baru__">＋ Tambah kategori baru...</option>
+          </select>
+        </div>
+        <div class="edit-field" id="wrapKategoriBaru" style="display:none">
+          <label>Nama kategori baru</label>
+          <input type="text" id="pengeluaranKategoriBaru" placeholder="Contoh: Transport">
+        </div>
+        <div class="edit-field">
+          <label>Jumlah (Rp)</label>
+          <input type="number" id="pengeluaranJumlah" min="0" required>
+        </div>
+        <div class="edit-modal-actions">
+          <button type="button" id="btnBatalPengeluaran" class="btn btn-ghost">Batal</button>
+          <button type="submit" class="btn btn-tosca-solid">Simpan pengeluaran</button>
+        </div>
+      </form>
     </div>
   </div>
 
