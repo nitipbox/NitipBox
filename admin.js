@@ -1,5 +1,5 @@
 // ⚠️ ISI SAMA PERSIS seperti nilai yang sudah kamu isi di app.js (project Supabase yang sama)
-const SUPABASE_URL = 'Https://NitipBox.my.id'
+const SUPABASE_URL = 'https://tevehzihkqhqmxlrtdhl.supabase.co'
 const SUPABASE_KEY = 'sb_publishable_NMoOIVW_lTA1lMsdkG2x1A_Qj0iRFIu'
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
