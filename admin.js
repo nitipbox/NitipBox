@@ -127,6 +127,14 @@ function hitungJatuhTempo(tanggalMasuk, hari) {
 function formatTanggalID(d) {
   return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
 }
+function hitungTarif(ukuran, hari) {
+  var tarifHarian = basisTarif[ukuran] || 0;
+  var kotor = tarifHarian * (hari || 1);
+  var diskon = 0;
+  if ((hari || 1) >= 30) diskon = 0.30;
+  else if ((hari || 1) >= 7) diskon = 0.15;
+  return Math.ceil((kotor - kotor * diskon) / 100) * 100;
+}
 
 /* =============================================
    MUAT SEMUA DATA
@@ -179,7 +187,9 @@ async function muatVerifikasi() {
   }
 
   wrap.innerHTML = '';
+  window._pendingCache = {};
   pending.forEach(function(row) {
+    window._pendingCache[row.id] = row;
     var aj = labelAntarJemput(row.layanan);
     var div = document.createElement('div');
     div.className = 'order-row';
@@ -190,6 +200,7 @@ async function muatVerifikasi() {
         '<p class="order-meta">' + row.deskripsi + ' · ' + row.ukuran.replace('-', ' - ') + ' · ' + row.hari + ' hari · ' + (row.lokasi || '-') + ' · <span class="badge-mini ' + aj.kelas + '" style="display:inline-block">' + aj.teks + '</span></p>' +
       '</div>' +
       '<div class="order-actions">' +
+        '<button class="btn btn-icon" title="Sunting" data-aksi="edit" data-id="' + row.id + '">✏️</button>' +
         '<button class="btn btn-icon" title="Hapus permanen" data-aksi="hapus" data-id="' + row.id + '">🗑️</button>' +
         '<button class="btn btn-ghost" data-aksi="tolak" data-id="' + row.id + '">Tolak</button>' +
         '<button class="btn btn-tosca-solid" data-aksi="konfirmasi" data-id="' + row.id + '">Konfirmasi</button>' +
@@ -198,7 +209,10 @@ async function muatVerifikasi() {
   });
 
   wrap.querySelectorAll('button[data-aksi]').forEach(function(btn) {
-    btn.addEventListener('click', function() { prosesAksiVerifikasi(btn.dataset.aksi, btn.dataset.id); });
+    btn.addEventListener('click', function() {
+      if (btn.dataset.aksi === 'edit') { bukaEditModal(btn.dataset.id); return; }
+      prosesAksiVerifikasi(btn.dataset.aksi, btn.dataset.id);
+    });
   });
 }
 
@@ -214,6 +228,46 @@ async function prosesAksiVerifikasi(aksi, id) {
   muatVerifikasi();
   muatListOrderan();
 }
+
+/* =============================================
+   MODAL EDIT ORDERAN
+   ============================================= */
+function bukaEditModal(id) {
+  var row = (window._pendingCache || {})[id];
+  if (!row) return;
+  document.getElementById('editId').value = row.id;
+  document.getElementById('editNama').value = row.nama;
+  document.getElementById('editWa').value = row.wa;
+  document.getElementById('editDeskripsi').value = row.deskripsi;
+  document.getElementById('editUkuran').value = row.ukuran;
+  document.getElementById('editHari').value = row.hari;
+  document.getElementById('editLayanan').value = row.layanan;
+  document.getElementById('editIdentitas').value = row.identitas;
+  document.getElementById('editModalOverlay').classList.add('show');
+}
+function tutupEditModal() {
+  document.getElementById('editModalOverlay').classList.remove('show');
+}
+document.getElementById('btnTutupEdit').addEventListener('click', tutupEditModal);
+document.getElementById('btnBatalEdit').addEventListener('click', tutupEditModal);
+document.getElementById('editModalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) tutupEditModal();
+});
+document.getElementById('formEdit').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  var id = document.getElementById('editId').value;
+  await db.from('titipan').update({
+    nama: document.getElementById('editNama').value,
+    wa: document.getElementById('editWa').value,
+    deskripsi: document.getElementById('editDeskripsi').value,
+    ukuran: document.getElementById('editUkuran').value,
+    hari: parseInt(document.getElementById('editHari').value, 10) || 1,
+    layanan: document.getElementById('editLayanan').value,
+    identitas: document.getElementById('editIdentitas').value
+  }).eq('id', id);
+  tutupEditModal();
+  muatVerifikasi();
+});
 
 /* =============================================
    TAB: LIST ORDERAN
@@ -240,13 +294,15 @@ async function muatListOrderan() {
     if (sudahJatuhTempo) jumlahTempo++; else jumlahBerjalan++;
 
     var aj = labelAntarJemput(row.layanan);
+    var tarif = hitungTarif(row.ukuran, row.hari);
     var div = document.createElement('div');
     div.className = 'list-row';
     div.innerHTML =
-      '<div><p class="list-cell-name">' + row.nama + '</p><p class="list-cell-nik">NIK ...' + row.identitas + '</p></div>' +
-      '<span class="list-kode">' + row.kode + '</span>' +
+      '<div><p class="list-cell-name">' + row.nama + ' <span class="list-kode">· ' + row.kode + '</span></p><p class="list-cell-nik">' + row.wa + ' · NIK ...' + row.identitas + '</p></div>' +
+      '<span>' + row.deskripsi + '</span>' +
       '<span>' + row.ukuran.split('-')[0] + ' · ' + row.hari + ' hari</span>' +
       '<span class="badge-mini ' + aj.kelas + '">' + aj.teks + '</span>' +
+      '<span style="font-weight:bold">Rp ' + tarif.toLocaleString('id-ID') + '</span>' +
       (sudahJatuhTempo
         ? '<span class="jatuh-tempo-warn"><span class="warn-icon">⚠️</span>' + formatTanggalID(jt) + '</span>'
         : '<span>' + formatTanggalID(jt) + '</span>') +
@@ -295,7 +351,18 @@ async function cariDanTampilkanLabel() {
   area.style.display = 'flex';
 }
 
-document.getElementById('btnPrintLabel').addEventListener('click', function() { window.print(); });
+document.getElementById('btnPrintLabel').addEventListener('click', function() {
+  var ukuran = document.getElementById('labelUkuranKertas').value; // contoh: "50x30"
+  var parts = ukuran.split('x');
+  var styleTag = document.getElementById('printPageSizeStyle');
+  if (!styleTag) {
+    styleTag = document.createElement('style');
+    styleTag.id = 'printPageSizeStyle';
+    document.head.appendChild(styleTag);
+  }
+  styleTag.textContent = '@page { size: ' + parts[0] + 'mm ' + parts[1] + 'mm; margin: 0; } .label-card { width: ' + parts[0] + 'mm !important; }';
+  window.print();
+});
 
 /* =============================================
    REALTIME NOTIFIKASI ORDER BARU
