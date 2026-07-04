@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NitipBox Admin</title>
 <link rel="stylesheet" href="admin.css">
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
@@ -104,9 +104,28 @@
           </div>
         </div>
 
+        <div class="filter-bar">
+          <select id="filterWilayah">
+            <option value="semua">Semua wilayah</option>
+            <option value="Surabaya">Surabaya (SBY)</option>
+            <option value="Sidoarjo">Sidoarjo (SDA01)</option>
+            <option value="Sidoarjo 2 (Back Up)">Sidoarjo 2 (SDA02)</option>
+          </select>
+          <select id="filterStatus">
+            <option value="semua">Semua status</option>
+            <option value="berjalan">Order berjalan</option>
+            <option value="tempo">Order jatuh tempo</option>
+          </select>
+          <select id="filterUrutan">
+            <option value="terbaru">Order terbaru</option>
+            <option value="terlama">Order terlama</option>
+          </select>
+        </div>
+
         <div class="list-table">
           <div class="list-row list-head">
             <span>Pelanggan</span>
+            <span>Wilayah</span>
             <span>Barang</span>
             <span>Tipe order</span>
             <span>Antar/jemput</span>
@@ -146,21 +165,25 @@
         </div>
 
         <div id="labelPrintArea" class="label-print-wrap" style="display:none">
-          <div id="labelCard" class="label-card">
-            <div class="label-card-head">
-              <span class="label-brand">NitipBox</span>
-              <span id="labelLokasi" class="label-lokasi">–</span>
-            </div>
-            <div class="label-card-body">
-              <p class="label-eyebrow">Kode label</p>
-              <p id="labelKode" class="label-kode">NTB-0000</p>
-              <svg id="labelBarcode" class="label-barcode"></svg>
-              <div class="label-detail">
-                <div class="label-detail-row"><span>Nama</span><span id="labelNama">–</span></div>
-                <div class="label-detail-row"><span>No. WA</span><span id="labelWa">–</span></div>
-                <div class="label-detail-row"><span>Barang</span><span id="labelBarang">–</span></div>
-                <div class="label-detail-row"><span>Ukuran</span><span id="labelUkuran">–</span></div>
-                <div class="label-detail-row"><span>Masuk</span><span id="labelMasuk">–</span></div>
+          <div id="labelPrintTarget" class="label-print-target">
+            <div id="labelCard" class="label-card">
+              <div class="label-card-head">
+                <span class="label-brand">NitipBox</span>
+                <span id="labelLokasi" class="label-lokasi">–</span>
+              </div>
+              <div class="label-card-columns">
+                <div class="label-col-left">
+                  <p class="label-eyebrow">Kode label</p>
+                  <p id="labelKode" class="label-kode">NTB-0000</p>
+                  <canvas id="labelQR" class="label-qr"></canvas>
+                </div>
+                <div class="label-col-right">
+                  <div class="label-detail-row"><span>Nama</span><span id="labelNama">–</span></div>
+                  <div class="label-detail-row"><span>No. WA</span><span id="labelWa">–</span></div>
+                  <div class="label-detail-row"><span>Barang</span><span id="labelBarang">–</span></div>
+                  <div class="label-detail-row"><span>Ukuran</span><span id="labelUkuran">–</span></div>
+                  <div class="label-detail-row"><span>Masuk</span><span id="labelMasuk">–</span></div>
+                </div>
               </div>
             </div>
           </div>
