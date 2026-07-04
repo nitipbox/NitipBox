@@ -236,12 +236,13 @@ body {
 
 .list-row {
   display: grid;
-  grid-template-columns: 1.2fr 0.85fr 0.9fr 0.85fr 0.9fr 0.8fr 0.9fr 0.75fr;
-  gap: 8px;
+  grid-template-columns: 1.1fr 0.75fr 0.8fr 0.8fr 0.85fr 0.75fr 0.85fr 0.75fr 0.7fr;
+  gap: 6px;
   align-items: center;
   padding: 12px 14px;
   border-bottom: 1px solid var(--border);
 }
+.list-row-actions { display: flex; gap: 6px; }
 .list-row:last-child { border-bottom: none; }
 .list-head { background: var(--bg-light); font-size: 12px; color: var(--text-muted); font-weight: bold; }
 .list-cell-name { font-size: 14px; font-weight: bold; margin: 0; }
@@ -336,9 +337,32 @@ body {
 
 /* ============ PRINT ============ */
 @media print {
-  body.lagi-print > *:not(#labelPrintTarget) { display: none !important; }
-  #labelPrintTarget { position: fixed; top: 0; left: 0; border: none; }
+  body.lagi-print > *:not(.cetak-target) { display: none !important; }
+  .cetak-target { position: fixed; top: 0; left: 0; border: none; }
 }
+
+/* ============ NOTA ============ */
+.nota-print-target {
+  background: #fff;
+  border: 2px dashed var(--tosca-solid);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 18px;
+  width: calc(100% - 36px);
+}
+.nota-header { background: var(--tosca-dark); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; }
+.nota-brand { color: #fff; font-size: 14px; font-weight: bold; }
+.nota-lokasi { color: #9FE1CB; font-size: 12px; }
+.nota-body { padding: 20px; text-align: center; }
+.nota-qr { display: flex; justify-content: center; margin-bottom: 10px; }
+.nota-kode { font-size: 22px; font-weight: bold; color: var(--tosca-dark); letter-spacing: 1.5px; margin: 0 0 16px; }
+.nota-rincian { text-align: left; font-size: 13px; color: var(--text-muted); display: flex; flex-direction: column; gap: 6px; max-width: 280px; margin: 0 auto; }
+.nota-row { display: flex; justify-content: space-between; gap: 10px; }
+.nota-row span:last-child { color: var(--text); font-weight: bold; }
+.nota-row.nota-total { font-size: 15px; }
+.nota-row.nota-total span:last-child { color: var(--tosca-dark); }
+.nota-divider { border-top: 1px dashed var(--border); margin: 4px 0; }
+.nota-footer { text-align: center; font-size: 11px; color: var(--text-muted); padding: 0 20px 16px; }
 
 /* ============ MODAL EDIT ORDERAN ============ */
 .edit-modal-overlay {
