@@ -183,6 +183,29 @@ body {
   .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+@media (max-width: 640px) {
+  .app-shell { flex-direction: column; }
+  .sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 10px;
+    gap: 6px;
+  }
+  .sidebar-brand { width: 100%; margin: 0 0 4px 4px; }
+  .nav-item { width: auto; flex: 1 1 auto; font-size: 12px; padding: 8px 10px; justify-content: center; }
+  .nav-item span:not(.nav-icon):not(.nav-badge):not(.nav-soon) { display: none; }
+  .nav-soon { display: none; }
+  .sidebar-footer { width: 100%; flex-direction: row; align-items: center; justify-content: space-between; border-top: none; padding-top: 4px; }
+  .sidebar-email { display: none; }
+  .main { padding: 16px; }
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+  .panel-head h2 { font-size: 18px; }
+  .order-row { flex-direction: column; align-items: flex-start; }
+  .order-actions { width: 100%; justify-content: flex-end; }
+}
+
 /* ============ ORDER LIST (verifikasi) ============ */
 .order-list { display: flex; flex-direction: column; gap: 10px; }
 .order-row {
@@ -224,7 +247,8 @@ body {
 .empty-state { color: var(--text-muted); font-size: 14px; text-align: center; padding: 30px 0; }
 
 /* ============ LIST ORDERAN TABLE ============ */
-.list-table { background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.list-table { background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow-x: auto; }
+.list-row { min-width: 720px; }
 .filter-bar { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
 .filter-bar select {
   padding: 8px 12px;
@@ -260,12 +284,6 @@ body {
 .badge-danger { background: var(--danger-bg); color: var(--danger); }
 .jatuh-tempo-warn { display: flex; align-items: center; gap: 5px; color: var(--danger); font-weight: bold; }
 .jatuh-tempo-warn .warn-icon { font-size: 14px; }
-
-@media (max-width: 900px) {
-  .list-row { grid-template-columns: 1fr; gap: 4px; }
-  .list-head { display: none; }
-  .list-row:not(.list-head) { padding: 14px 16px; }
-}
 
 /* ============ CETAK LABEL ============ */
 .label-search { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 20px; max-width: 420px; }
