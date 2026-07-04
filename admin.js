@@ -497,8 +497,8 @@ document.getElementById('btnPrintLabel').addEventListener('click', function() {
 
 var CSS_PRINT_LABEL_NOTA =
   'body{margin:0;padding:18px;background:#fff;font-family:Segoe UI,Arial,sans-serif}' +
-  '.label-print-target{overflow:hidden;position:relative;background:#fff;border:2px dashed #00b89c;border-radius:10px}' +
-  '.label-card{transform-origin:top left;background:#fff;overflow:hidden}' +
+  '.label-print-target{width:100mm;height:50mm;overflow:hidden;position:relative;background:#fff;border:2px dashed #00b89c;border-radius:10px}' +
+  '.label-card{width:100mm;height:50mm;transform-origin:top left;background:#fff;overflow:hidden}' +
   '.label-card-head{background:#005a4e;padding:8px 14px;display:flex;align-items:center;justify-content:space-between}' +
   '.label-brand{font-size:13px;font-weight:bold;color:#fff}' +
   '.label-lokasi{font-size:11px;color:#9FE1CB}' +
