@@ -381,13 +381,10 @@ async function cariDanTampilkanLabel() {
   area.style.display = 'flex';
   terapkanUkuranLabel();
 
+  var qrWrap = document.getElementById('labelQR');
+  qrWrap.innerHTML = '';
   try {
-    QRCode.toCanvas(document.getElementById('labelQR'), data.kode, { width: 90, margin: 0 }, function(err) {
-      if (err) {
-        console.error('Gagal membuat QR:', err);
-        msg.textContent = 'Label tampil, tapi QR gagal dibuat (cek koneksi internet).';
-      }
-    });
+    new QRCode(qrWrap, { text: data.kode, width: 90, height: 90, correctLevel: QRCode.CorrectLevel.M });
   } catch (err) {
     console.error('Gagal membuat QR:', err);
     msg.textContent = 'Label tampil, tapi QR gagal dibuat (cek koneksi internet).';
@@ -425,6 +422,22 @@ function terapkanUkuranLabel() {
 
 document.getElementById('btnPrintLabel').addEventListener('click', function() {
   terapkanUkuranLabel();
+
+  var target = document.getElementById('labelPrintTarget');
+  var originalParent = target.parentNode;
+  var originalNextSibling = target.nextSibling;
+
+  // pindahkan keluar dari struktur dashboard (yg tinggi) biar nggak numpuk banyak halaman kosong
+  document.body.appendChild(target);
+  document.body.classList.add('lagi-print');
+
+  function kembalikan() {
+    document.body.classList.remove('lagi-print');
+    originalParent.insertBefore(target, originalNextSibling);
+    window.removeEventListener('afterprint', kembalikan);
+  }
+  window.addEventListener('afterprint', kembalikan);
+
   window.print();
 });
 
