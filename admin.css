@@ -406,6 +406,25 @@ body {
 .keuangan-keluar { color: var(--danger); font-weight: bold; }
 .keuangan-saldo { font-weight: bold; }
 
+/* ============ ANALISIS ORDERAN ============ */
+.breakdown-box { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; margin-bottom: 4px; }
+.breakdown-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 13px; }
+.breakdown-item:last-child { margin-bottom: 0; }
+.breakdown-label { flex: 0 0 140px; color: var(--text); }
+.breakdown-bar-wrap { flex: 1; background: var(--bg-light); border-radius: 6px; height: 18px; overflow: hidden; }
+.breakdown-bar { background: var(--tosca-solid); height: 100%; border-radius: 6px; }
+.breakdown-count { flex: 0 0 40px; text-align: right; font-weight: bold; color: var(--tosca-dark); }
+
+/* ============ GALERI ============ */
+.galeri-tabs { display: flex; gap: 8px; }
+.galeri-tab-btn { background: var(--bg-light); border: none; border-radius: 20px; padding: 7px 18px; font-size: 13px; font-weight: bold; color: var(--text-muted); cursor: pointer; }
+.galeri-tab-btn.active { background: var(--tosca-solid); color: #fff; }
+.galeri-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 14px; }
+.galeri-thumb { position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 1; background: var(--bg-light); }
+.galeri-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.galeri-upload-tile { border: 2px dashed var(--border); border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted); font-size: 26px; background: #fff; position: relative; }
+.galeri-upload-tile input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
 /* ============ MODAL EDIT ORDERAN ============ */
 .edit-modal-overlay {
   display: none;
