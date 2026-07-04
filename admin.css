@@ -225,12 +225,21 @@ body {
 
 /* ============ LIST ORDERAN TABLE ============ */
 .list-table { background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.filter-bar { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.filter-bar select {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  background: #fff;
+}
+
 .list-row {
   display: grid;
-  grid-template-columns: 1.2fr 1fr 0.9fr 1fr 0.9fr 0.9fr 0.8fr;
-  gap: 10px;
+  grid-template-columns: 1.2fr 0.85fr 0.9fr 0.85fr 0.9fr 0.8fr 0.9fr 0.75fr;
+  gap: 8px;
   align-items: center;
-  padding: 12px 16px;
+  padding: 12px 14px;
   border-bottom: 1px solid var(--border);
 }
 .list-row:last-child { border-bottom: none; }
@@ -271,27 +280,37 @@ body {
 .label-search-msg { font-size: 12px; color: var(--danger); margin: 8px 0 0; min-height: 14px; }
 
 .label-print-wrap { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
-.label-card {
-  width: 300px;
+.label-print-target {
+  width: 100mm;
+  height: 50mm;
+  overflow: hidden;
+  position: relative;
   background: #fff;
   border: 2px dashed var(--tosca-solid);
   border-radius: 10px;
+}
+.label-card {
+  width: 100mm;
+  height: 50mm;
+  transform-origin: top left;
+  background: #fff;
   overflow: hidden;
 }
 .label-card-head {
   background: var(--tosca-dark);
-  padding: 10px 14px;
+  padding: 8px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 .label-brand { font-size: 13px; font-weight: bold; color: #fff; }
 .label-lokasi { font-size: 11px; color: #9FE1CB; }
-.label-card-body { padding: 14px; }
-.label-eyebrow { text-align: center; font-size: 11px; color: var(--text-muted); letter-spacing: 0.08em; margin: 0; }
-.label-kode { text-align: center; font-size: 22px; font-weight: bold; color: var(--tosca-dark); letter-spacing: 2px; margin: 2px 0 8px; }
-.label-barcode { width: 100%; height: auto; display: block; margin-bottom: 8px; }
-.label-detail { border-top: 1px dashed var(--border); padding-top: 10px; font-size: 12px; color: var(--text-muted); display: flex; flex-direction: column; gap: 5px; }
+.label-card-columns { display: flex; padding: 14px; gap: 16px; }
+.label-col-left { flex: 0 0 42%; display: flex; flex-direction: column; align-items: center; }
+.label-eyebrow { text-align: center; font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em; margin: 0; }
+.label-kode { text-align: center; font-size: 19px; font-weight: bold; color: var(--tosca-dark); letter-spacing: 1.5px; margin: 2px 0 10px; }
+.label-qr { display: block; margin: 0 auto; }
+.label-col-right { flex: 1; border-left: 1px dashed var(--border); padding-left: 14px; display: flex; flex-direction: column; justify-content: center; gap: 8px; font-size: 13px; color: var(--text-muted); }
 .label-detail-row { display: flex; justify-content: space-between; gap: 10px; }
 .label-detail-row span:last-child { color: var(--text); font-weight: bold; text-align: right; }
 .btn-print { padding: 10px 18px; }
@@ -318,8 +337,8 @@ body {
 /* ============ PRINT ============ */
 @media print {
   body * { visibility: hidden; }
-  .label-card, .label-card * { visibility: visible; }
-  .label-card { position: absolute; top: 0; left: 0; border: 1px solid #000; }
+  .label-print-target, .label-print-target * { visibility: visible; }
+  .label-print-target { position: absolute; top: 0; left: 0; border: none; }
 }
 
 /* ============ MODAL EDIT ORDERAN ============ */
