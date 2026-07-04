@@ -303,7 +303,7 @@ document.getElementById('filterUrutan').addEventListener('change', renderListOrd
 document.getElementById('searchListOrderan').addEventListener('input', renderListOrderan);
 
 async function muatListOrderan() {
-  const { data } = await db.from('titipan').select('*').eq('status', 'aktif').order('created_at', { ascending: false });
+  const { data } = await db.from('titipan').select('*').in('status', ['aktif', 'diambil']).order('created_at', { ascending: false });
   _listOrderanCache = data || [];
   renderListOrderan();
 }
@@ -322,14 +322,17 @@ function renderListOrderan() {
     var jt = hitungJatuhTempo(row.tanggal_masuk, row.hari);
     var jtTanpaJam = new Date(jt); jtTanpaJam.setHours(0,0,0,0);
     row._jt = jt;
-    row._jatuhTempo = jtTanpaJam <= hariIni;
+    row._sudahDiambil = row.status === 'diambil';
+    row._jatuhTempo = !row._sudahDiambil && jtTanpaJam <= hariIni;
     return row;
   });
 
-  var jumlahBerjalanTotal = data.filter(function(r) { return !r._jatuhTempo; }).length;
+  var jumlahBerjalanTotal = data.filter(function(r) { return !r._jatuhTempo && !r._sudahDiambil; }).length;
   var jumlahTempoTotal = data.filter(function(r) { return r._jatuhTempo; }).length;
+  var jumlahDiambilTotal = data.filter(function(r) { return r._sudahDiambil; }).length;
   document.getElementById('pillBerjalan').textContent = 'Berjalan ' + jumlahBerjalanTotal;
   document.getElementById('pillTempo').textContent = 'Jatuh tempo ' + jumlahTempoTotal;
+  document.getElementById('pillDiambil').textContent = 'Sudah diambil ' + jumlahDiambilTotal;
 
   // terapkan pencarian
   if (kataKunci) {
@@ -343,8 +346,9 @@ function renderListOrderan() {
 
   // terapkan filter
   if (wilayahFilter !== 'semua') data = data.filter(function(r) { return r.lokasi === wilayahFilter; });
-  if (statusFilter === 'berjalan') data = data.filter(function(r) { return !r._jatuhTempo; });
+  if (statusFilter === 'berjalan') data = data.filter(function(r) { return !r._jatuhTempo && !r._sudahDiambil; });
   if (statusFilter === 'tempo') data = data.filter(function(r) { return r._jatuhTempo; });
+  if (statusFilter === 'diambil') data = data.filter(function(r) { return r._sudahDiambil; });
 
   // terapkan urutan
   data.sort(function(a, b) {
@@ -377,9 +381,11 @@ function renderListOrderan() {
       (row._jatuhTempo
         ? '<span class="jatuh-tempo-warn"><span class="warn-icon">⚠️</span>' + formatTanggalID(row._jt) + '</span>'
         : '<span>' + formatTanggalID(row._jt) + '</span>') +
-      (row._jatuhTempo
-        ? '<span class="badge-mini badge-danger">Jatuh tempo</span>'
-        : '<span class="badge-mini badge-tosca">Berjalan</span>') +
+      (row._sudahDiambil
+        ? '<span class="badge-mini badge-neutral">Sudah diambil</span>'
+        : row._jatuhTempo
+          ? '<span class="badge-mini badge-danger">Jatuh tempo</span>'
+          : '<span class="badge-mini badge-tosca">Berjalan</span>') +
       '<div class="list-row-actions">' +
         '<button class="btn btn-icon" title="Nota" data-list-aksi="nota" data-id="' + row.id + '">🧾</button>' +
         '<button class="btn btn-icon" title="Hapus" data-list-aksi="hapus" data-id="' + row.id + '">🗑️</button>' +
@@ -568,7 +574,7 @@ async function muatKeuangan() {
   await muatKategoriPengeluaran();
 
   const [{ data: aktifRows }, { data: pengeluaranRows }, { data: pemasukanLainRows }] = await Promise.all([
-    db.from('titipan').select('kode, nama, ukuran, hari, lokasi, created_at').eq('status', 'aktif'),
+    db.from('titipan').select('kode, nama, ukuran, hari, lokasi, created_at').in('status', ['aktif', 'diambil']),
     db.from('pengeluaran').select('*'),
     db.from('pemasukan_lain').select('*')
   ]);
@@ -917,7 +923,7 @@ document.getElementById('btnExportPdf').addEventListener('click', function() {
 async function muatAnalisis() {
   const { data } = await db.from('titipan').select('status, ukuran, hari, lokasi, layanan, created_at');
   var semua = data || [];
-  var aktif = semua.filter(function(r) { return r.status === 'aktif'; });
+  var aktif = semua.filter(function(r) { return r.status === 'aktif' || r.status === 'diambil'; });
   var ditolak = semua.filter(function(r) { return r.status === 'ditolak'; });
 
   document.getElementById('aTotalOrder').textContent = semua.length;
