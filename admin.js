@@ -154,6 +154,7 @@ function hitungTarifDetail(ukuran, hari) {
 function muatSemuaData() {
   muatVerifikasi();
   muatListOrderan();
+  muatKeuangan();
 }
 
 /* =============================================
@@ -533,6 +534,235 @@ function aktifkanRealtimeNotif() {
     })
     .subscribe();
 }
+
+/* =============================================
+   TAB: KEUANGAN
+   ============================================= */
+async function muatKeuangan() {
+  await muatKategoriPengeluaran();
+
+  const [{ data: aktifRows }, { data: pengeluaranRows }] = await Promise.all([
+    db.from('titipan').select('kode, nama, ukuran, hari, created_at').eq('status', 'aktif'),
+    db.from('pengeluaran').select('*')
+  ]);
+
+  // gabungkan jadi 1 ledger
+  var ledger = [];
+  (aktifRows || []).forEach(function(row) {
+    ledger.push({
+      tanggal: new Date(row.created_at),
+      keterangan: 'Booking ' + row.kode + ' · ' + row.nama,
+      kategori: 'Booking',
+      masuk: hitungTarif(row.ukuran, row.hari),
+      keluar: 0
+    });
+  });
+  (pengeluaranRows || []).forEach(function(row) {
+    ledger.push({
+      tanggal: new Date(row.tanggal),
+      keterangan: row.keterangan,
+      kategori: row.kategori,
+      masuk: 0,
+      keluar: Number(row.jumlah)
+    });
+  });
+
+  // urutkan lama ke baru buat hitung saldo berjalan, saldo awal Rp0
+  ledger.sort(function(a, b) { return a.tanggal - b.tanggal; });
+  var saldo = 0;
+  ledger.forEach(function(item) {
+    saldo += item.masuk - item.keluar;
+    item.saldo = saldo;
+  });
+
+  window._keuanganLedger = ledger;
+  renderKeuanganStat(ledger, saldo);
+  renderRingkasanPajak(ledger);
+  renderTrenChart(ledger);
+  renderRiwayatTransaksi(ledger);
+}
+
+function renderKeuanganStat(ledger, saldoAkhir) {
+  var now = new Date();
+  var bulanIni = now.getMonth(), tahunIni = now.getFullYear();
+  var pemasukan = 0, pengeluaran = 0;
+  ledger.forEach(function(item) {
+    if (item.tanggal.getMonth() === bulanIni && item.tanggal.getFullYear() === tahunIni) {
+      pemasukan += item.masuk;
+      pengeluaran += item.keluar;
+    }
+  });
+  document.getElementById('kPemasukanBulan').textContent = 'Rp ' + pemasukan.toLocaleString('id-ID');
+  document.getElementById('kPengeluaranBulan').textContent = 'Rp ' + pengeluaran.toLocaleString('id-ID');
+  document.getElementById('kLabaBulan').textContent = 'Rp ' + (pemasukan - pengeluaran).toLocaleString('id-ID');
+  document.getElementById('kSaldoKas').textContent = 'Rp ' + saldoAkhir.toLocaleString('id-ID');
+}
+
+function renderRingkasanPajak(ledger) {
+  var now = new Date();
+  var bulanIni = now.getMonth(), tahunIni = now.getFullYear();
+  var omzetBulan = 0, bebanBulan = 0, omzetTahun = 0, bebanTahun = 0;
+  ledger.forEach(function(item) {
+    if (item.tanggal.getFullYear() === tahunIni) {
+      omzetTahun += item.masuk;
+      bebanTahun += item.keluar;
+      if (item.tanggal.getMonth() === bulanIni) {
+        omzetBulan += item.masuk;
+        bebanBulan += item.keluar;
+      }
+    }
+  });
+  var rp = function(n) { return 'Rp ' + Math.round(n).toLocaleString('id-ID'); };
+  document.getElementById('pOmzetBulan').textContent = rp(omzetBulan);
+  document.getElementById('pOmzetTahun').textContent = rp(omzetTahun);
+  document.getElementById('pBebanBulan').textContent = rp(bebanBulan);
+  document.getElementById('pBebanTahun').textContent = rp(bebanTahun);
+  document.getElementById('pLabaBulan').textContent = rp(omzetBulan - bebanBulan);
+  document.getElementById('pLabaTahun').textContent = rp(omzetTahun - bebanTahun);
+  document.getElementById('pPphBulan').textContent = rp(omzetBulan * 0.005);
+  document.getElementById('pPphTahun').textContent = rp(omzetTahun * 0.005);
+}
+
+function renderTrenChart(ledger) {
+  var hariLabel = [];
+  var pemasukanHarian = [];
+  var pengeluaranHarian = [];
+  for (var i = 6; i >= 0; i--) {
+    var d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() - i);
+    var masuk = 0, keluar = 0;
+    ledger.forEach(function(item) {
+      var t = new Date(item.tanggal); t.setHours(0,0,0,0);
+      if (t.getTime() === d.getTime()) { masuk += item.masuk; keluar += item.keluar; }
+    });
+    pemasukanHarian.push(masuk);
+    pengeluaranHarian.push(keluar);
+  }
+
+  var maxVal = Math.max.apply(null, pemasukanHarian.concat(pengeluaranHarian, [1]));
+  function ke_titik(arr) {
+    return arr.map(function(v, i) {
+      var x = (560 / 6) * i;
+      var y = 110 - (v / maxVal) * 100;
+      return x + ',' + y;
+    }).join(' ');
+  }
+
+  var svg = document.getElementById('trenChart');
+  svg.innerHTML =
+    '<polyline points="' + ke_titik(pemasukanHarian) + '" fill="none" stroke="#00b89c" stroke-width="3"/>' +
+    '<polyline points="' + ke_titik(pengeluaranHarian) + '" fill="none" stroke="#c62828" stroke-width="2" stroke-dasharray="4 3"/>';
+}
+
+function renderRiwayatTransaksi(ledger) {
+  var wrap = document.getElementById('riwayatTransaksiBody');
+  if (ledger.length === 0) {
+    wrap.innerHTML = '<p class="empty-state">Belum ada transaksi tercatat.</p>';
+    return;
+  }
+  var terbaruDulu = ledger.slice().reverse();
+  wrap.innerHTML = '';
+  terbaruDulu.forEach(function(item) {
+    var div = document.createElement('div');
+    div.className = 'list-row keuangan-row';
+    div.innerHTML =
+      '<span>' + formatTanggalID(item.tanggal) + '</span>' +
+      '<span>' + item.keterangan + '</span>' +
+      '<span>' + item.kategori + '</span>' +
+      '<span class="keuangan-masuk">' + (item.masuk > 0 ? 'Rp ' + item.masuk.toLocaleString('id-ID') : '–') + '</span>' +
+      '<span class="keuangan-keluar">' + (item.keluar > 0 ? 'Rp ' + item.keluar.toLocaleString('id-ID') : '–') + '</span>' +
+      '<span class="keuangan-saldo">Rp ' + item.saldo.toLocaleString('id-ID') + '</span>';
+    wrap.appendChild(div);
+  });
+}
+
+/* =============================================
+   KATEGORI PENGELUARAN
+   ============================================= */
+async function muatKategoriPengeluaran() {
+  const { data } = await db.from('kategori_pengeluaran').select('nama').order('nama', { ascending: true });
+  var sel = document.getElementById('pengeluaranKategori');
+  var opsiLama = sel.querySelectorAll('option[data-kategori]');
+  opsiLama.forEach(function(o) { o.remove(); });
+  (data || []).forEach(function(row) {
+    var opt = document.createElement('option');
+    opt.value = row.nama;
+    opt.textContent = row.nama;
+    opt.setAttribute('data-kategori', '1');
+    sel.insertBefore(opt, sel.firstChild);
+  });
+}
+
+document.getElementById('pengeluaranKategori').addEventListener('change', function() {
+  document.getElementById('wrapKategoriBaru').style.display = this.value === '__baru__' ? 'block' : 'none';
+});
+
+/* =============================================
+   MODAL TAMBAH PENGELUARAN
+   ============================================= */
+document.getElementById('btnTambahPengeluaran').addEventListener('click', function() {
+  document.getElementById('formPengeluaran').reset();
+  document.getElementById('pengeluaranTanggal').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('wrapKategoriBaru').style.display = 'none';
+  document.getElementById('pengeluaranModalOverlay').classList.add('show');
+});
+function tutupPengeluaranModal() {
+  document.getElementById('pengeluaranModalOverlay').classList.remove('show');
+}
+document.getElementById('btnTutupPengeluaran').addEventListener('click', tutupPengeluaranModal);
+document.getElementById('btnBatalPengeluaran').addEventListener('click', tutupPengeluaranModal);
+document.getElementById('pengeluaranModalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) tutupPengeluaranModal();
+});
+
+document.getElementById('formPengeluaran').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  var kategoriPilihan = document.getElementById('pengeluaranKategori').value;
+  var kategoriFinal = kategoriPilihan;
+
+  if (kategoriPilihan === '__baru__') {
+    kategoriFinal = document.getElementById('pengeluaranKategoriBaru').value.trim();
+    if (!kategoriFinal) { alert('Nama kategori baru wajib diisi.'); return; }
+    await db.from('kategori_pengeluaran').upsert({ nama: kategoriFinal }, { onConflict: 'nama' });
+  }
+
+  await db.from('pengeluaran').insert({
+    tanggal: document.getElementById('pengeluaranTanggal').value,
+    keterangan: document.getElementById('pengeluaranKeterangan').value,
+    kategori: kategoriFinal,
+    jumlah: parseFloat(document.getElementById('pengeluaranJumlah').value) || 0
+  });
+
+  tutupPengeluaranModal();
+  muatKeuangan();
+});
+
+/* =============================================
+   EXPORT PDF — riwayat transaksi
+   ============================================= */
+document.getElementById('btnExportPdf').addEventListener('click', function() {
+  var rows = document.getElementById('riwayatTransaksiBody').innerHTML;
+  var headHtml = '<div class="list-row keuangan-row keuangan-head"><span>Tanggal</span><span>Keterangan</span><span>Kategori</span><span>Masuk</span><span>Keluar</span><span>Saldo</span></div>';
+
+  var target = document.createElement('div');
+  target.id = 'exportPdfTarget';
+  target.className = 'cetak-target export-pdf-wrap';
+  target.innerHTML =
+    '<h2 style="color:#005a4e">NitipBox — Riwayat Transaksi Keuangan</h2>' +
+    '<p style="font-size:12px;color:#888;margin-bottom:14px">Dicetak: ' + new Date().toLocaleString('id-ID') + '</p>' +
+    '<div class="list-table">' + headHtml + rows + '</div>';
+
+  document.body.appendChild(target);
+  document.body.classList.add('lagi-print');
+
+  function bersihkan() {
+    document.body.classList.remove('lagi-print');
+    target.remove();
+    window.removeEventListener('afterprint', bersihkan);
+  }
+  window.addEventListener('afterprint', bersihkan);
+
+  window.print();
+});
 
 /* =============================================
    START
