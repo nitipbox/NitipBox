@@ -77,7 +77,7 @@ function switchTab(target) {
 var prefixLokasi = { "Surabaya": "SBY", "Sidoarjo": "SDA01", "Sidoarjo 2 (Back Up)": "SDA02" }
 
 async function generateKodeBooking(lokasi) {
-  const prefix = prefixLokasi[lokasi] || "NTB"
+  const prefix = "NTB-" + (prefixLokasi[lokasi] || "UMUM")
   const { data } = await db.from('titipan').select('kode').ilike('kode', prefix + '-%').order('created_at', { ascending: false }).limit(200)
   let maxNomor = 0
   ;(data || []).forEach(row => {
