@@ -400,7 +400,7 @@ body {
 .legend-tosca { color: var(--tosca-solid); font-weight: bold; }
 .legend-danger { color: var(--danger); font-weight: bold; }
 
-.keuangan-row { grid-template-columns: 0.9fr 1.6fr 1fr 1fr 1fr 1fr; }
+.keuangan-row { grid-template-columns: 0.9fr 1.4fr 0.9fr 0.9fr 0.9fr 0.9fr 0.7fr; }
 .keuangan-head { background: var(--bg-light); font-size: 12px; color: var(--text-muted); font-weight: bold; }
 .keuangan-masuk { color: var(--tosca-dark); font-weight: bold; }
 .keuangan-keluar { color: var(--danger); font-weight: bold; }
