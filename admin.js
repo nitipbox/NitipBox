@@ -429,101 +429,47 @@ document.getElementById('labelKodeInput').addEventListener('keydown', function(e
 async function cariDanTampilkanLabel() {
   var kode = document.getElementById('labelKodeInput').value.trim().toUpperCase();
   var msg = document.getElementById('labelSearchMsg');
-  var area = document.getElementById('labelPrintArea');
   msg.textContent = '';
   if (!kode) { msg.textContent = 'Masukkan kode booking dulu.'; return; }
 
   const { data, error } = await db.from('titipan').select('*').eq('kode', kode).maybeSingle();
   if (!data || error) {
-    area.style.display = 'none';
     msg.textContent = 'Kode booking tidak ditemukan.';
     return;
   }
 
-  document.getElementById('labelLokasi').textContent = data.lokasi || '-';
+  var jt = hitungJatuhTempo(data.tanggal_masuk, data.hari);
+
   document.getElementById('labelKode').textContent = data.kode;
   document.getElementById('labelNama').textContent = data.nama;
   document.getElementById('labelWa').textContent = data.wa;
+  document.getElementById('labelMasuk').textContent = formatTanggalID(new Date(data.tanggal_masuk));
+  document.getElementById('labelJatuhTempo').textContent = formatTanggalID(jt);
+  document.getElementById('labelLayanan').textContent = data.ukuran.split('-')[0] + ' · ' + data.hari + ' hari';
   document.getElementById('labelBarang').textContent = data.deskripsi;
-  document.getElementById('labelUkuran').textContent = data.ukuran.replace('-', ' - ');
-  document.getElementById('labelMasuk').textContent = new Date(data.tanggal_masuk).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
-
-  area.style.display = 'flex';
-  terapkanUkuranLabel();
 
   var qrWrap = document.getElementById('labelQR');
   qrWrap.innerHTML = '';
   try {
-    new QRCode(qrWrap, { text: data.kode, width: 90, height: 90, correctLevel: QRCode.CorrectLevel.M });
+    new QRCode(qrWrap, { text: data.kode, width: 70, height: 70, correctLevel: QRCode.CorrectLevel.M });
   } catch (err) {
     console.error('Gagal membuat QR:', err);
     msg.textContent = 'Label tampil, tapi QR gagal dibuat (cek koneksi internet).';
   }
+
+  document.getElementById('labelModalOverlay').classList.add('show');
 }
 
-/* =============================================
-   UKURAN LABEL — scale otomatis biar selalu pas 1 halaman
-   ============================================= */
-document.getElementById('labelUkuranKertas').addEventListener('change', terapkanUkuranLabel);
-
-function terapkanUkuranLabel() {
-  var ukuran = document.getElementById('labelUkuranKertas').value; // contoh: "50x30"
-  var parts = ukuran.split('x');
-  var targetW = parseFloat(parts[0]);
-  var targetH = parseFloat(parts[1]);
-  var baseW = 100, baseH = 50; // ukuran desain dasar (mm), jangan diubah
-
-  var target = document.getElementById('labelPrintTarget');
-  var card = document.getElementById('labelCard');
-  var factor = Math.min(targetW / baseW, targetH / baseH);
-
-  target.style.width = targetW + 'mm';
-  target.style.height = targetH + 'mm';
-  card.style.transform = 'scale(' + factor + ')';
-
-  var styleTag = document.getElementById('printPageSizeStyle');
-  if (!styleTag) {
-    styleTag = document.createElement('style');
-    styleTag.id = 'printPageSizeStyle';
-    document.head.appendChild(styleTag);
-  }
-  styleTag.textContent = '@page { size: ' + targetW + 'mm ' + targetH + 'mm; margin: 0; }';
+function tutupLabelModal() {
+  document.getElementById('labelModalOverlay').classList.remove('show');
 }
-
-document.getElementById('btnPrintLabel').addEventListener('click', function() {
-  terapkanUkuranLabel();
+document.getElementById('btnTutupLabel').addEventListener('click', tutupLabelModal);
+document.getElementById('labelModalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) tutupLabelModal();
+});
+document.getElementById('btnCetakLabel').addEventListener('click', function() {
   cetakElemen('labelPrintTarget');
 });
-
-var CSS_PRINT_LABEL_NOTA =
-  'body{margin:0;padding:18px;background:#fff;font-family:Segoe UI,Arial,sans-serif}' +
-  '.label-print-target{width:100mm;height:50mm;overflow:hidden;position:relative;background:#fff;border:2px dashed #00b89c;border-radius:10px}' +
-  '.label-card{width:100mm;height:50mm;transform-origin:top left;background:#fff;overflow:hidden}' +
-  '.label-card-head{background:#005a4e;padding:8px 14px;display:flex;align-items:center;justify-content:space-between}' +
-  '.label-brand{font-size:13px;font-weight:bold;color:#fff}' +
-  '.label-lokasi{font-size:11px;color:#9FE1CB}' +
-  '.label-card-columns{display:flex;padding:14px;gap:16px}' +
-  '.label-col-left{flex:0 0 42%;display:flex;flex-direction:column;align-items:center}' +
-  '.label-eyebrow{text-align:center;font-size:10px;color:#888;letter-spacing:.08em;margin:0}' +
-  '.label-kode{text-align:center;font-size:19px;font-weight:bold;color:#005a4e;letter-spacing:1.5px;margin:2px 0 10px}' +
-  '.label-qr{display:flex;justify-content:center;width:90px;height:90px;margin:0 auto}' +
-  '.label-col-right{flex:1;border-left:1px dashed #e0e0e0;padding-left:14px;display:flex;flex-direction:column;justify-content:center;gap:8px;font-size:13px;color:#888}' +
-  '.label-detail-row{display:flex;justify-content:space-between;gap:10px}' +
-  '.label-detail-row span:last-child{color:#333;font-weight:bold;text-align:right}' +
-  '.nota-print-target{background:#fff;border:2px dashed #00b89c;border-radius:10px;overflow:hidden;width:100%}' +
-  '.nota-header{background:#005a4e;padding:10px 16px;display:flex;justify-content:space-between;align-items:center}' +
-  '.nota-brand{color:#fff;font-size:14px;font-weight:bold}' +
-  '.nota-lokasi{color:#9FE1CB;font-size:12px}' +
-  '.nota-body{padding:20px;text-align:center}' +
-  '.nota-qr{display:flex;justify-content:center;margin-bottom:10px}' +
-  '.nota-kode{font-size:22px;font-weight:bold;color:#005a4e;letter-spacing:1.5px;margin:0 0 16px}' +
-  '.nota-rincian{text-align:left;font-size:13px;color:#888;display:flex;flex-direction:column;gap:6px;max-width:280px;margin:0 auto}' +
-  '.nota-row{display:flex;justify-content:space-between;gap:10px}' +
-  '.nota-row span:last-child{color:#333;font-weight:bold}' +
-  '.nota-row.nota-total{font-size:15px}' +
-  '.nota-row.nota-total span:last-child{color:#005a4e}' +
-  '.nota-divider{border-top:1px dashed #e0e0e0;margin:4px 0}' +
-  '.nota-footer{text-align:center;font-size:11px;color:#888;padding:0 20px 16px}';
 
 var CSS_PRINT_KEUANGAN =
   'body{margin:0;padding:24px;background:#fff;font-family:Segoe UI,Arial,sans-serif}' +
@@ -551,13 +497,12 @@ function cetakElemen(id) {
     cloneCanvases[i].parentNode.replaceChild(img, cloneCanvases[i]);
   });
 
-  var pageSizeTag = document.getElementById('printPageSizeStyle');
-  var pageSizeCss = pageSizeTag ? pageSizeTag.textContent : '';
-
+  // Label & Nota sekarang 100% inline style, jadi tidak butuh CSS eksternal apa pun.
+  // Cukup reset margin body biar rapi pas print.
   var jendela = window.open('', '_blank', 'width=420,height=640');
   jendela.document.write(
     '<!DOCTYPE html><html><head><meta charset="utf-8">' +
-    '<style>' + CSS_PRINT_LABEL_NOTA + ' ' + pageSizeCss + '</style>' +
+    '<style>body{margin:0;padding:18px;background:#fff}@page{margin:8mm}</style>' +
     '</head><body>' + clone.outerHTML + '</body></html>'
   );
   jendela.document.close();
@@ -577,25 +522,20 @@ function bukaNotaModal(id) {
   if (!row) return;
 
   var d = hitungTarifDetail(row.ukuran, row.hari);
-  var aj = labelAntarJemput(row.layanan);
-  var tglMasuk = new Date(row.tanggal_masuk).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+  var jt = hitungJatuhTempo(row.tanggal_masuk, row.hari);
 
-  document.getElementById('notaLokasi').textContent = row.lokasi || '-';
   document.getElementById('notaKode').textContent = row.kode;
-  document.getElementById('notaTanggal').textContent = tglMasuk;
-  document.getElementById('notaDurasi').textContent = row.hari + ' hari';
-  document.getElementById('notaLayanan').textContent = aj.teks;
-  document.getElementById('notaDasar').textContent = 'Rp ' + d.tarifHarian.toLocaleString('id-ID') + '/hari';
-  document.getElementById('notaDiskon').textContent = d.persenDiskon > 0
-    ? '- Rp ' + d.nominalDiskon.toLocaleString('id-ID') + ' (' + (d.persenDiskon * 100) + '%)'
-    : 'Tidak ada';
+  document.getElementById('notaNama').textContent = row.nama;
+  document.getElementById('notaTanggalTransaksi').textContent = formatTanggalID(new Date(row.created_at));
+  document.getElementById('notaLayanan').textContent = row.ukuran.split('-')[0] + ' · ' + row.hari + ' hari';
+  document.getElementById('notaTanggal').textContent = formatTanggalID(new Date(row.tanggal_masuk));
+  document.getElementById('notaJatuhTempo').textContent = formatTanggalID(jt);
   document.getElementById('notaTotal').textContent = 'Rp ' + d.total.toLocaleString('id-ID');
-  document.getElementById('notaDp').textContent = 'Rp ' + d.dp.toLocaleString('id-ID');
 
   var qrWrap = document.getElementById('notaQR');
   qrWrap.innerHTML = '';
   try {
-    new QRCode(qrWrap, { text: row.kode, width: 110, height: 110, correctLevel: QRCode.CorrectLevel.M });
+    new QRCode(qrWrap, { text: row.kode, width: 90, height: 90, correctLevel: QRCode.CorrectLevel.M });
   } catch (err) {
     console.error('Gagal membuat QR nota:', err);
   }
