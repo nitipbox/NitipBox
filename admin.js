@@ -538,23 +538,28 @@ function aktifkanRealtimeNotif() {
 /* =============================================
    TAB: KEUANGAN
    ============================================= */
+document.getElementById('filterCabangKeuangan').addEventListener('change', function() {
+  renderSemuaKeuangan(window._keuanganLedgerFull || []);
+});
+
 async function muatKeuangan() {
   await muatKategoriPengeluaran();
 
   const [{ data: aktifRows }, { data: pengeluaranRows }] = await Promise.all([
-    db.from('titipan').select('kode, nama, ukuran, hari, created_at').eq('status', 'aktif'),
+    db.from('titipan').select('kode, nama, ukuran, hari, lokasi, created_at').eq('status', 'aktif'),
     db.from('pengeluaran').select('*')
   ]);
 
-  // gabungkan jadi 1 ledger
   var ledger = [];
   (aktifRows || []).forEach(function(row) {
     ledger.push({
       tanggal: new Date(row.created_at),
       keterangan: 'Booking ' + row.kode + ' · ' + row.nama,
       kategori: 'Booking',
+      lokasi: row.lokasi || '',
       masuk: hitungTarif(row.ukuran, row.hari),
-      keluar: 0
+      keluar: 0,
+      bukti: null
     });
   });
   (pengeluaranRows || []).forEach(function(row) {
@@ -562,17 +567,30 @@ async function muatKeuangan() {
       tanggal: new Date(row.tanggal),
       keterangan: row.keterangan,
       kategori: row.kategori,
+      lokasi: row.lokasi || '',
       masuk: 0,
-      keluar: Number(row.jumlah)
+      keluar: Number(row.jumlah),
+      bukti: row.bukti_url || null
     });
   });
 
-  // urutkan lama ke baru buat hitung saldo berjalan, saldo awal Rp0
   ledger.sort(function(a, b) { return a.tanggal - b.tanggal; });
+  window._keuanganLedgerFull = ledger;
+  renderSemuaKeuangan(ledger);
+}
+
+function renderSemuaKeuangan(ledgerFull) {
+  var cabang = document.getElementById('filterCabangKeuangan').value;
+  var label = document.getElementById('kSaldoLabel');
+
+  var ledger = cabang === 'semua' ? ledgerFull : ledgerFull.filter(function(i) { return i.lokasi === cabang; });
+  label.textContent = cabang === 'semua' ? 'Saldo kas saat ini' : 'Saldo bersih cabang ini';
+
+  // hitung ulang saldo berjalan khusus untuk subset yang lagi ditampilkan
   var saldo = 0;
-  ledger.forEach(function(item) {
+  ledger = ledger.map(function(item) {
     saldo += item.masuk - item.keluar;
-    item.saldo = saldo;
+    return Object.assign({}, item, { saldo: saldo });
   });
 
   window._keuanganLedger = ledger;
@@ -670,7 +688,8 @@ function renderRiwayatTransaksi(ledger) {
       '<span>' + item.kategori + '</span>' +
       '<span class="keuangan-masuk">' + (item.masuk > 0 ? 'Rp ' + item.masuk.toLocaleString('id-ID') : '–') + '</span>' +
       '<span class="keuangan-keluar">' + (item.keluar > 0 ? 'Rp ' + item.keluar.toLocaleString('id-ID') : '–') + '</span>' +
-      '<span class="keuangan-saldo">Rp ' + item.saldo.toLocaleString('id-ID') + '</span>';
+      '<span class="keuangan-saldo">Rp ' + item.saldo.toLocaleString('id-ID') + '</span>' +
+      '<span>' + (item.bukti ? '<a href="' + item.bukti + '" target="_blank" rel="noopener">📎 Lihat</a>' : '–') + '</span>';
     wrap.appendChild(div);
   });
 }
@@ -696,6 +715,45 @@ document.getElementById('pengeluaranKategori').addEventListener('change', functi
   document.getElementById('wrapKategoriBaru').style.display = this.value === '__baru__' ? 'block' : 'none';
 });
 
+document.getElementById('pengeluaranBukti').addEventListener('change', function(e) {
+  var file = e.target.files[0];
+  var preview = document.getElementById('pengeluaranBuktiPreview');
+  if (!file) { preview.style.display = 'none'; return; }
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    preview.src = ev.target.result;
+    preview.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+});
+
+/* =============================================
+   KOMPRESI GAMBAR sebelum upload (canvas resize)
+   ============================================= */
+function kompresGambar(file, maxDim, kualitas) {
+  return new Promise(function(resolve, reject) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var img = new Image();
+      img.onload = function() {
+        var w = img.width, h = img.height;
+        if (w > h && w > maxDim) { h = Math.round(h * (maxDim / w)); w = maxDim; }
+        else if (h > maxDim) { w = Math.round(w * (maxDim / h)); h = maxDim; }
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        canvas.toBlob(function(blob) {
+          if (blob) resolve(blob); else reject(new Error('Gagal kompres gambar'));
+        }, 'image/jpeg', kualitas || 0.7);
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 /* =============================================
    MODAL TAMBAH PENGELUARAN
    ============================================= */
@@ -703,6 +761,7 @@ document.getElementById('btnTambahPengeluaran').addEventListener('click', functi
   document.getElementById('formPengeluaran').reset();
   document.getElementById('pengeluaranTanggal').value = new Date().toISOString().slice(0, 10);
   document.getElementById('wrapKategoriBaru').style.display = 'none';
+  document.getElementById('pengeluaranBuktiPreview').style.display = 'none';
   document.getElementById('pengeluaranModalOverlay').classList.add('show');
 });
 function tutupPengeluaranModal() {
@@ -716,24 +775,50 @@ document.getElementById('pengeluaranModalOverlay').addEventListener('click', fun
 
 document.getElementById('formPengeluaran').addEventListener('submit', async function(e) {
   e.preventDefault();
-  var kategoriPilihan = document.getElementById('pengeluaranKategori').value;
-  var kategoriFinal = kategoriPilihan;
+  var btn = document.getElementById('btnSimpanPengeluaran');
+  var fileInput = document.getElementById('pengeluaranBukti');
+  var file = fileInput.files[0];
 
-  if (kategoriPilihan === '__baru__') {
-    kategoriFinal = document.getElementById('pengeluaranKategoriBaru').value.trim();
-    if (!kategoriFinal) { alert('Nama kategori baru wajib diisi.'); return; }
-    await db.from('kategori_pengeluaran').upsert({ nama: kategoriFinal }, { onConflict: 'nama' });
+  if (!file) { alert('Foto bukti nota/transfer wajib diupload.'); return; }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Mengupload foto...';
+
+  try {
+    var kategoriPilihan = document.getElementById('pengeluaranKategori').value;
+    var kategoriFinal = kategoriPilihan;
+
+    if (kategoriPilihan === '__baru__') {
+      kategoriFinal = document.getElementById('pengeluaranKategoriBaru').value.trim();
+      if (!kategoriFinal) { alert('Nama kategori baru wajib diisi.'); btn.disabled = false; btn.textContent = 'Simpan pengeluaran'; return; }
+      await db.from('kategori_pengeluaran').upsert({ nama: kategoriFinal }, { onConflict: 'nama' });
+    }
+
+    var blob = await kompresGambar(file, 1000, 0.7);
+    var namaFile = 'bukti-' + Date.now() + '.jpg';
+    const { error: uploadError } = await db.storage.from('bukti-pengeluaran').upload(namaFile, blob, { contentType: 'image/jpeg' });
+    if (uploadError) throw uploadError;
+    const { data: urlData } = db.storage.from('bukti-pengeluaran').getPublicUrl(namaFile);
+
+    await db.from('pengeluaran').insert({
+      tanggal: document.getElementById('pengeluaranTanggal').value,
+      keterangan: document.getElementById('pengeluaranKeterangan').value,
+      kategori: kategoriFinal,
+      lokasi: document.getElementById('pengeluaranLokasi').value || null,
+      jumlah: parseFloat(document.getElementById('pengeluaranJumlah').value) || 0,
+      bukti_url: urlData.publicUrl
+    });
+
+    btn.disabled = false;
+    btn.textContent = 'Simpan pengeluaran';
+    tutupPengeluaranModal();
+    muatKeuangan();
+  } catch (err) {
+    console.error('Gagal simpan pengeluaran:', err);
+    alert('Gagal menyimpan: ' + err.message);
+    btn.disabled = false;
+    btn.textContent = 'Simpan pengeluaran';
   }
-
-  await db.from('pengeluaran').insert({
-    tanggal: document.getElementById('pengeluaranTanggal').value,
-    keterangan: document.getElementById('pengeluaranKeterangan').value,
-    kategori: kategoriFinal,
-    jumlah: parseFloat(document.getElementById('pengeluaranJumlah').value) || 0
-  });
-
-  tutupPengeluaranModal();
-  muatKeuangan();
 });
 
 /* =============================================
@@ -741,7 +826,7 @@ document.getElementById('formPengeluaran').addEventListener('submit', async func
    ============================================= */
 document.getElementById('btnExportPdf').addEventListener('click', function() {
   var rows = document.getElementById('riwayatTransaksiBody').innerHTML;
-  var headHtml = '<div class="list-row keuangan-row keuangan-head"><span>Tanggal</span><span>Keterangan</span><span>Kategori</span><span>Masuk</span><span>Keluar</span><span>Saldo</span></div>';
+  var headHtml = '<div class="list-row keuangan-row keuangan-head"><span>Tanggal</span><span>Keterangan</span><span>Kategori</span><span>Masuk</span><span>Keluar</span><span>Saldo</span><span>Bukti</span></div>';
 
   var target = document.createElement('div');
   target.id = 'exportPdfTarget';
