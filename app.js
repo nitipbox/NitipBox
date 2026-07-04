@@ -74,14 +74,17 @@ function switchTab(target) {
 /* =============================================
    GENERATE KODE BOOKING (ganti logic scan spreadsheet)
    ============================================= */
-async function generateKodeBooking() {
-  const { data } = await db.from('titipan').select('kode').order('created_at', { ascending: false }).limit(50)
+var prefixLokasi = { "Surabaya": "SBY", "Sidoarjo": "SDA01", "Sidoarjo 2 (Back Up)": "SDA02" }
+
+async function generateKodeBooking(lokasi) {
+  const prefix = prefixLokasi[lokasi] || "NTB"
+  const { data } = await db.from('titipan').select('kode').ilike('kode', prefix + '-%').order('created_at', { ascending: false }).limit(200)
   let maxNomor = 0
   ;(data || []).forEach(row => {
-    const angka = parseInt((row.kode || '').replace('NTB-', ''), 10)
+    const angka = parseInt((row.kode || '').replace(prefix + '-', ''), 10)
     if (!isNaN(angka) && angka > maxNomor) maxNomor = angka
   })
-  return "NTB-" + String(maxNomor + 1).padStart(4, '0')
+  return prefix + "-" + String(maxNomor + 1).padStart(4, '0')
 }
 
 /* =============================================
@@ -97,7 +100,7 @@ async function submitFormOrder(form) {
   var refKode = refInput && refInput.value.trim() ? refInput.value.trim().toUpperCase() : null;
 
   try {
-    const kode = await generateKodeBooking()
+   const kode = await generateKodeBooking(lokasiPilihan)
     const { error } = await db.from('titipan').insert({
       kode,
       tanggal_masuk: form.tanggal.value,
