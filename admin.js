@@ -106,12 +106,23 @@ document.querySelectorAll('.nav-item[data-tab]').forEach(function(btn) {
   });
 });
 
+var _judulTab = {
+  verifikasi: 'Verifikasi orderan',
+  listorderan: 'List orderan',
+  label: 'Cetak label',
+  analisis: 'Analisis orderan',
+  keuangan: 'Keuangan',
+  galeri: 'Galeri'
+};
+
 function pindahTab(namaTab) {
   document.querySelectorAll('.nav-item').forEach(function(b) { b.classList.remove('active'); });
   document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
   var navBtn = document.querySelector('.nav-item[data-tab="' + namaTab + '"]');
   if (navBtn) navBtn.classList.add('active');
   document.getElementById('tab-' + namaTab).classList.add('active');
+  var judulEl = document.getElementById('mobileTopbarTitle');
+  if (judulEl) judulEl.textContent = _judulTab[namaTab] || 'NitipBox admin';
 }
 
 /* =============================================
