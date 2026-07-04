@@ -132,6 +132,7 @@
             <span>Tarif</span>
             <span>Jatuh tempo</span>
             <span>Status</span>
+            <span>Aksi</span>
           </div>
           <div id="listOrderanBody">
             <p class="empty-state">Memuat data orderan...</p>
@@ -165,7 +166,7 @@
         </div>
 
         <div id="labelPrintArea" class="label-print-wrap" style="display:none">
-          <div id="labelPrintTarget" class="label-print-target">
+          <div id="labelPrintTarget" class="label-print-target cetak-target">
             <div id="labelCard" class="label-card">
               <div class="label-card-head">
                 <span class="label-brand">NitipBox</span>
@@ -252,6 +253,40 @@
           <button type="submit" class="btn btn-tosca-solid">Simpan perubahan</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL NOTA -->
+  <div id="notaModalOverlay" class="edit-modal-overlay">
+    <div class="edit-modal">
+      <div class="edit-modal-head">
+        <span>Nota booking</span>
+        <button id="btnTutupNota" class="edit-modal-close" aria-label="Tutup">✕</button>
+      </div>
+      <div id="notaPrintTarget" class="nota-print-target cetak-target">
+        <div class="nota-header">
+          <span class="nota-brand">NitipBox</span>
+          <span id="notaLokasi" class="nota-lokasi">–</span>
+        </div>
+        <div class="nota-body">
+          <div id="notaQR" class="nota-qr"></div>
+          <p id="notaKode" class="nota-kode">NTB-0000</p>
+          <div class="nota-rincian">
+            <div class="nota-row"><span>Tanggal masuk</span><span id="notaTanggal">–</span></div>
+            <div class="nota-row"><span>Durasi</span><span id="notaDurasi">–</span></div>
+            <div class="nota-row"><span>Layanan</span><span id="notaLayanan">–</span></div>
+            <div class="nota-divider"></div>
+            <div class="nota-row"><span>Tarif dasar</span><span id="notaDasar">–</span></div>
+            <div class="nota-row"><span>Diskon</span><span id="notaDiskon">–</span></div>
+            <div class="nota-row nota-total"><span>Total bayar</span><span id="notaTotal">–</span></div>
+            <div class="nota-row"><span>Minimal DP (30%)</span><span id="notaDp">–</span></div>
+          </div>
+        </div>
+        <p class="nota-footer">Simpan nota ini sebagai bukti booking Anda.</p>
+      </div>
+      <div class="edit-modal-actions" style="padding:0 18px 18px">
+        <button type="button" id="btnCetakNota" class="btn btn-tosca-solid">🖨️ Cetak / simpan nota</button>
+      </div>
     </div>
   </div>
 
