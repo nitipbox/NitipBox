@@ -77,16 +77,16 @@ function switchTab(target) {
 var prefixLokasi = { "Surabaya": "SBY", "Sidoarjo": "SDA01", "Sidoarjo 2 (Back Up)": "SDA02" }
 
 async function generateKodeBooking(lokasi) {
-  const prefix = "NTB-" + (prefixLokasi[lokasi] || "UMUM")
+  const kodeWilayah = prefixLokasi[lokasi] || "UMUM"
+  const prefix = "NTB-" + kodeWilayah
   const { data } = await db.from('titipan').select('kode').ilike('kode', prefix + '-%').order('created_at', { ascending: false }).limit(200)
   let maxNomor = 0
   ;(data || []).forEach(row => {
     const angka = parseInt((row.kode || '').replace(prefix + '-', ''), 10)
     if (!isNaN(angka) && angka > maxNomor) maxNomor = angka
   })
-  return prefix + "-" + String(maxNomor + 1).padStart(4, '0')
+  return prefix + "-" + String(maxNomor + 1).padStart(3, '0')
 }
-
 /* =============================================
    SUBMIT FORM ORDER (Supabase, gantikan simpanDataJasa)
    ============================================= */
