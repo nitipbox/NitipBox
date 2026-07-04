@@ -1,7 +1,7 @@
 // ⚠️ Baris SUPABASE_URL sudah diisi sesuai project Supabase NitipBox kamu.
 // Baris SUPABASE_KEY WAJIB kamu isi sendiri dari: Supabase Dashboard > Settings > API > "anon public" key
 const SUPABASE_URL = 'https://tevehzihkqhqmxlrtdhl.supabase.co'
-const SUPABASE_KEY = 'sb_publishable_NMoOIVW_lTA1lMsdkG2x1A_Qj0iRFIu''
+const SUPABASE_KEY = 'sb_publishable_NMoOIVW_lTA1lMsdkG2x1A_Qj0iRFIu'
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
 var basisTarif = { "Kecil-S": 3000, "Sedang-M": 7000, "Besar-L": 12000, "Sangat Besar-XL": 20000, "Super Besar-XXL+": 50000 };
