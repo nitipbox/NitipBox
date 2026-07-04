@@ -1,511 +1,563 @@
-:root {
-  --tosca: #00d1b2;
-  --tosca-solid: #00b89c;
-  --tosca-dark: #005a4e;
-  --tosca-bg: #e6fffa;
-  --bg-light: #f4f7f6;
-  --danger: #c62828;
-  --danger-bg: #ffebee;
-  --border: #e0e0e0;
-  --text: #333;
-  --text-muted: #888;
-}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NitipBox Admin</title>
+<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
 
-* { box-sizing: border-box; }
+  <!-- TOP BAR MOBILE -->
+  <div id="mobileTopbar" class="mobile-topbar">
+    <div>
+      <p class="mobile-topbar-eyebrow">NitipBox admin</p>
+      <h2 id="mobileTopbarTitle" class="mobile-topbar-title">Verifikasi orderan</h2>
+    </div>
+    <button id="btnLogoutMobile" class="mobile-topbar-avatar" aria-label="Keluar / profil">
+      <i class="ti ti-user" aria-hidden="true"></i>
+    </button>
+  </div>
 
-body {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: var(--bg-light);
-  margin: 0;
-  color: var(--text);
-}
+  <!-- LOGIN SCREEN -->
+  <div id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="login-logo">NitipBox</div>
+      <p class="login-sub">Panel admin</p>
+      <button id="btnLoginGoogle" class="btn-google">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 01-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.81.54-1.85.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.94v2.33A9 9 0 009 18z"/><path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 010-3.44V4.95H.94a9 9 0 000 8.1l3.03-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.9 11.42 0 9 0A9 9 0 00.94 4.95L3.97 7.28C4.68 5.16 6.66 3.58 9 3.58z"/></svg>
+        Masuk dengan Google
+      </button>
+      <p id="loginMsg" class="login-msg"></p>
+    </div>
+  </div>
 
-/* ============ LOGIN ============ */
-.login-screen {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--tosca-dark) 0%, #0c1a18 100%);
-}
-.login-card {
-  background: #fff;
-  border-radius: 14px;
-  padding: 40px 36px;
-  text-align: center;
-  width: 320px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.25);
-}
-.login-logo { font-size: 24px; font-weight: bold; color: var(--tosca-dark); margin-bottom: 4px; }
-.login-sub { font-size: 13px; color: var(--text-muted); margin: 0 0 24px; }
-.btn-google {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 11px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: #fff;
-  font-size: 14px;
-  font-weight: bold;
-  color: #444;
-  cursor: pointer;
-}
-.btn-google:hover { background: #f7f7f7; }
-.login-msg { font-size: 12px; color: var(--danger); margin: 14px 0 0; min-height: 14px; }
+  <!-- APP SHELL -->
+  <div id="appShell" class="app-shell" style="display:none">
+    <div class="sidebar">
+      <p class="sidebar-brand">NitipBox admin</p>
+      <button class="nav-item active" data-tab="verifikasi">
+        <i class="ti ti-hourglass nav-icon" aria-hidden="true"></i>
+        <span>Verifikasi orderan</span>
+        <span id="badgeVerifikasi" class="nav-badge" style="display:none">0</span>
+      </button>
+      <button class="nav-item" data-tab="listorderan">
+        <i class="ti ti-clipboard-list nav-icon" aria-hidden="true"></i>
+        <span>List orderan</span>
+      </button>
+      <button class="nav-item" data-tab="label">
+        <i class="ti ti-tag nav-icon" aria-hidden="true"></i>
+        <span>Cetak label</span>
+      </button>
+      <button class="nav-item" data-tab="analisis">
+        <i class="ti ti-chart-bar nav-icon" aria-hidden="true"></i>
+        <span>Analisis orderan</span>
+      </button>
+      <button class="nav-item" data-tab="keuangan">
+        <i class="ti ti-wallet nav-icon" aria-hidden="true"></i>
+        <span>Keuangan</span>
+      </button>
+      <button class="nav-item" data-tab="galeri">
+        <i class="ti ti-photo nav-icon" aria-hidden="true"></i>
+        <span>Galeri</span>
+      </button>
+      <div class="sidebar-footer">
+        <div class="sidebar-avatar"><i class="ti ti-user" aria-hidden="true"></i></div>
+        <span id="adminEmail" class="sidebar-email"></span>
+        <button id="btnLogout" class="btn-logout" aria-label="Keluar"><i class="ti ti-logout" aria-hidden="true"></i></button>
+      </div>
+    </div>
 
-/* ============ APP SHELL ============ */
-.app-shell { display: flex; min-height: 100vh; }
+    <div class="main">
 
-.sidebar {
-  width: 230px;
-  flex-shrink: 0;
-  background: var(--tosca-dark);
-  padding: 20px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.sidebar-brand { color: #fff; font-weight: bold; font-size: 16px; margin: 0 8px 16px; }
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: none;
-  background: transparent;
-  color: #c8ece4;
-  font-size: 13px;
-  font-weight: bold;
-  text-align: left;
-  cursor: pointer;
-  width: 100%;
-}
-.nav-item:hover:not(:disabled) { background: rgba(255,255,255,0.08); }
-.nav-item.active { background: var(--tosca-solid); color: #fff; }
-.nav-icon { font-size: 16px; width: 18px; text-align: center; }
-.nav-badge {
-  margin-left: auto;
-  background: #fff;
-  color: var(--tosca-dark);
-  font-size: 11px;
-  font-weight: bold;
-  border-radius: 20px;
-  padding: 1px 7px;
-  min-width: 18px;
-  text-align: center;
-}
-.nav-item-soon { opacity: 0.55; cursor: not-allowed; }
-.nav-soon {
-  margin-left: auto;
-  font-size: 10px;
-  background: rgba(255,255,255,0.12);
-  padding: 2px 6px;
-  border-radius: 20px;
-  font-weight: normal;
-}
-.sidebar-footer {
-  margin-top: auto;
-  border-top: 1px solid rgba(255,255,255,0.15);
-  padding-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.sidebar-email { font-size: 11px; color: #9bbab5; word-break: break-all; padding: 0 8px; }
-.btn-logout {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.25);
-  color: #fff;
-  border-radius: 8px;
-  padding: 8px;
-  font-size: 12px;
-  cursor: pointer;
-}
-.btn-logout:hover { background: rgba(255,255,255,0.1); }
+      <!-- TAB: VERIFIKASI ORDERAN -->
+      <section id="tab-verifikasi" class="tab-panel active">
+        <div class="panel-head">
+          <h2>Verifikasi orderan masuk</h2>
+          <span id="verifikasiCount" class="panel-sub">Memuat...</span>
+        </div>
 
-.main { flex: 1; padding: 28px 32px; min-width: 0; }
+        <div class="stat-grid">
+          <div class="stat-card stat-tosca">
+            <span class="stat-label">Order aktif</span>
+            <span id="statAktif" class="stat-value">–</span>
+          </div>
+          <div class="stat-card stat-alert">
+            <span class="stat-label">Jatuh tempo hari ini</span>
+            <span id="statTempo" class="stat-value">–</span>
+          </div>
+          <div class="stat-card stat-tosca">
+            <span class="stat-label">Pemasukan bulan ini</span>
+            <span id="statPemasukan" class="stat-value">–</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Belum diverifikasi</span>
+            <span id="statBelum" class="stat-value">–</span>
+          </div>
+        </div>
 
-.tab-panel { display: none; }
-.tab-panel.active { display: block; }
+        <div id="verifikasiList" class="order-list">
+          <p class="empty-state">Memuat data orderan...</p>
+        </div>
+      </section>
 
-.panel-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 18px;
-}
-.panel-head h2 { font-size: 22px; color: var(--tosca-dark); margin: 0; }
-.panel-sub { font-size: 13px; color: var(--text-muted); }
-.panel-pills { display: flex; gap: 8px; }
-.pill { font-size: 12px; font-weight: bold; padding: 5px 14px; border-radius: 20px; }
-.pill-tosca { background: var(--tosca-bg); color: var(--tosca-dark); }
-.pill-danger { background: var(--danger-bg); color: var(--danger); }
-.pill-neutral { background: var(--bg-light); color: var(--text-muted); }
+      <!-- TAB: LIST ORDERAN -->
+      <section id="tab-listorderan" class="tab-panel">
+        <div class="panel-head">
+          <h2>List orderan</h2>
+          <div class="panel-pills">
+            <span id="pillBerjalan" class="pill pill-tosca">Berjalan –</span>
+            <span id="pillTempo" class="pill pill-danger">Jatuh tempo –</span>
+            <span id="pillDiambil" class="pill pill-neutral">Sudah diambil –</span>
+          </div>
+        </div>
 
-/* ============ STAT CARDS (fixed alignment) ============ */
-.stat-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-  margin-bottom: 24px;
-}
-.stat-card {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 88px;
-}
-.stat-card.stat-tosca { background: var(--tosca-bg); border-color: transparent; }
-.stat-card.stat-alert { background: var(--danger-bg); border-color: transparent; }
-.stat-label {
-  font-size: 12.5px;
-  color: var(--text-muted);
-  line-height: 1.35;
-  display: block;
-  margin-bottom: 10px;
-}
-.stat-tosca .stat-label { color: var(--tosca-dark); }
-.stat-alert .stat-label { color: var(--danger); }
-.stat-value { font-size: 24px; font-weight: bold; color: var(--text); line-height: 1; }
-.stat-tosca .stat-value { color: var(--tosca-dark); }
-.stat-alert .stat-value { color: var(--danger); }
+        <div class="filter-bar">
+          <input type="text" id="searchListOrderan" placeholder="🔍 Cari nama, kode, atau barang..." class="search-input">
+          <select id="filterWilayah">
+            <option value="semua">Semua wilayah</option>
+            <option value="Surabaya">Surabaya (SBY)</option>
+            <option value="Sidoarjo">Sidoarjo (SDA01)</option>
+            <option value="Sidoarjo 2 (Back Up)">Sidoarjo 2 (SDA02)</option>
+          </select>
+          <select id="filterStatus">
+            <option value="semua">Semua status</option>
+            <option value="berjalan">Order berjalan</option>
+            <option value="tempo">Order jatuh tempo</option>
+            <option value="diambil">Sudah diambil</option>
+          </select>
+          <select id="filterUrutan">
+            <option value="terbaru">Order terbaru</option>
+            <option value="terlama">Order terlama</option>
+          </select>
+          <button id="btnScanCheckout" class="btn btn-tosca-solid">📷 Scan untuk Checkout</button>
+        </div>
 
-@media (max-width: 900px) {
-  .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
+        <div class="list-table">
+          <div class="list-row list-head">
+            <span>Pelanggan</span>
+            <span>Wilayah</span>
+            <span>Barang</span>
+            <span>Tipe order</span>
+            <span>Antar/jemput</span>
+            <span>Tarif</span>
+            <span>Jatuh tempo</span>
+            <span>Status</span>
+            <span>Aksi</span>
+          </div>
+          <div id="listOrderanBody">
+            <p class="empty-state">Memuat data orderan...</p>
+          </div>
+        </div>
+      </section>
 
-/* ============ MOBILE TOP BAR ============ */
-.mobile-topbar {
-  display: none;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--tosca-dark);
-  padding: 14px 18px;
-  position: sticky;
-  top: 0;
-  z-index: 500;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-.mobile-topbar-brand { color: #fff; font-weight: bold; font-size: 16px; }
-.mobile-topbar-logout { background: rgba(255,255,255,0.12); border: none; color: #fff; width: 34px; height: 34px; border-radius: 50%; font-size: 15px; cursor: pointer; }
+      <!-- TAB: CETAK LABEL -->
+      <section id="tab-label" class="tab-panel">
+        <div class="panel-head">
+          <h2>Cetak label</h2>
+        </div>
 
-@media (max-width: 640px) {
-  body.logged-in .mobile-topbar { display: flex; }
-  .app-shell { flex-direction: column; }
+        <div class="label-search">
+          <label for="labelKodeInput">Cari kode booking</label>
+          <div class="label-search-row">
+            <input type="text" id="labelKodeInput" placeholder="Contoh: NTB-0004">
+            <button id="btnCariLabel" class="btn-tosca-solid">Cari</button>
+          </div>
+          <p id="labelSearchMsg" class="label-search-msg"></p>
 
-  .sidebar {
-    position: fixed;
-    bottom: 0; left: 0; width: 100%;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-    padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
-    gap: 0;
-    box-shadow: 0 -2px 12px rgba(0,0,0,0.18);
-    z-index: 500;
-  }
-  .sidebar-brand, .sidebar-footer { display: none; }
-  .nav-item {
-    flex-direction: column;
-    width: auto;
-    flex: 1 1 0;
-    font-size: 10px;
-    padding: 6px 2px;
-    gap: 2px;
-    border-radius: 10px;
-  }
-  .nav-icon { font-size: 19px; }
-  .nav-item span:not(.nav-icon):not(.nav-badge) { font-size: 10px; }
-  .nav-soon { display: none; }
-  .nav-badge { position: absolute; top: 2px; right: 14%; }
-  .nav-item { position: relative; }
+          <label for="labelUkuranKertas" style="margin-top:14px">Ukuran printer thermal</label>
+          <select id="labelUkuranKertas">
+            <option value="30x20">30 × 20 mm</option>
+            <option value="40x30">40 × 30 mm</option>
+            <option value="50x30" selected>50 × 30 mm (default)</option>
+            <option value="58x40">58 × 40 mm</option>
+            <option value="100x50">100 × 50 mm</option>
+          </select>
+          <p class="label-search-msg" style="color:var(--text-muted)">Ukuran kertas print menyesuaikan otomatis saat cetak.</p>
+        </div>
 
-  .main { padding: 16px 14px 90px; }
-  .stat-grid { grid-template-columns: 1fr 1fr; }
-  .stat-card { border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-  .panel-head h2 { font-size: 18px; }
-  .panel-head { flex-direction: column; align-items: flex-start; gap: 10px; }
-  .order-row { flex-direction: column; align-items: flex-start; border-radius: 12px; }
-  .order-actions { width: 100%; justify-content: flex-end; }
-  .filter-bar { flex-direction: column; align-items: stretch; }
-  .filter-bar select, .filter-bar button, .search-input { width: 100%; }
-}
+        <div id="labelPrintArea" class="label-print-wrap" style="display:none">
+          <div id="labelPrintTarget" class="label-print-target cetak-target">
+            <div id="labelCard" class="label-card">
+              <div class="label-card-head">
+                <span class="label-brand">NitipBox</span>
+                <span id="labelLokasi" class="label-lokasi">–</span>
+              </div>
+              <div class="label-card-columns">
+                <div class="label-col-left">
+                  <p class="label-eyebrow">Kode label</p>
+                  <p id="labelKode" class="label-kode">NTB-0000</p>
+                  <div id="labelQR" class="label-qr"></div>
+                </div>
+                <div class="label-col-right">
+                  <div class="label-detail-row"><span>Nama</span><span id="labelNama">–</span></div>
+                  <div class="label-detail-row"><span>No. WA</span><span id="labelWa">–</span></div>
+                  <div class="label-detail-row"><span>Barang</span><span id="labelBarang">–</span></div>
+                  <div class="label-detail-row"><span>Ukuran</span><span id="labelUkuran">–</span></div>
+                  <div class="label-detail-row"><span>Masuk</span><span id="labelMasuk">–</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button id="btnPrintLabel" class="btn-tosca-solid btn-print">🖨️ Cetak label ini</button>
+        </div>
+      </section>
 
-/* ============ ORDER LIST (verifikasi) ============ */
-.order-list { display: flex; flex-direction: column; gap: 10px; }
-.order-row {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-.order-avatar {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: var(--tosca-bg);
-  color: var(--tosca-dark);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 13px;
-  flex-shrink: 0;
-}
-.order-info { flex: 1; min-width: 200px; }
-.order-name { font-size: 14px; font-weight: bold; margin: 0; }
-.order-name span { color: var(--text-muted); font-weight: normal; }
-.order-meta { font-size: 13px; color: var(--text-muted); margin: 2px 0 0; }
-.order-actions { display: flex; gap: 8px; flex-shrink: 0; }
+      <!-- TAB: KEUANGAN -->
+      <section id="tab-keuangan" class="tab-panel">
+        <div class="panel-head">
+          <h2>Keuangan</h2>
+          <div style="display:flex;gap:8px">
+            <button id="btnTambahPemasukan" class="btn btn-ghost">＋ Tambah pemasukan</button>
+            <button id="btnTambahPengeluaran" class="btn btn-ghost">＋ Tambah pengeluaran</button>
+            <button id="btnExportPdf" class="btn btn-tosca-solid">⬇ Export PDF</button>
+          </div>
+        </div>
 
-.btn { border: none; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: bold; cursor: pointer; }
-.btn-ghost { background: #f0f0f0; color: var(--text); }
-.btn-ghost:hover { background: #e4e4e4; }
-.btn-icon { background: #f0f0f0; padding: 8px 10px; }
-.btn-icon:hover { background: #f5d9d9; }
-.btn-tosca-solid { background: var(--tosca-solid); color: #fff; }
-.btn-tosca-solid:hover { background: var(--tosca-dark); }
-.empty-state { color: var(--text-muted); font-size: 14px; text-align: center; padding: 30px 0; }
+        <div class="filter-bar">
+          <select id="filterCabangKeuangan">
+            <option value="semua">Semua cabang</option>
+            <option value="Surabaya">Surabaya</option>
+            <option value="Sidoarjo">Sidoarjo</option>
+            <option value="Sidoarjo 2 (Back Up)">Sidoarjo 2</option>
+          </select>
+        </div>
 
-/* ============ LIST ORDERAN TABLE ============ */
-.list-table { background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow-x: auto; }
-.list-row { min-width: 720px; }
-.filter-bar { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
-.filter-bar select {
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 13px;
-  background: #fff;
-}
-.search-input { flex: 1; min-width: 180px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; }
+        <div class="stat-grid">
+          <div class="stat-card stat-tosca">
+            <span class="stat-label">Pemasukan bulan ini</span>
+            <span id="kPemasukanBulan" class="stat-value">–</span>
+          </div>
+          <div class="stat-card stat-alert">
+            <span class="stat-label">Pengeluaran bulan ini</span>
+            <span id="kPengeluaranBulan" class="stat-value">–</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Laba bersih bulan ini</span>
+            <span id="kLabaBulan" class="stat-value">–</span>
+          </div>
+          <div class="stat-card" style="background:var(--tosca-dark)">
+            <span id="kSaldoLabel" class="stat-label" style="color:#9FE1CB">Saldo kas saat ini</span>
+            <span id="kSaldoKas" class="stat-value" style="color:#fff">–</span>
+          </div>
+        </div>
 
-.galeri-checkout-banner { background: #fff8e1; color: #a56b00; font-size: 12.5px; padding: 8px 14px; border-radius: 8px; margin-bottom: 12px; }
-.scanner-manual-toggle { font-size: 12.5px; color: var(--tosca-solid); text-decoration: underline; cursor: pointer; text-align: center; margin: 12px 0 8px; }
-.scanner-modal { max-width: 340px; }
-#qrReaderBox { border-radius: 10px; overflow: hidden; }
+        <p class="panel-subtitle">Ringkasan laba & pajak</p>
+        <div class="pajak-table">
+          <div class="pajak-row pajak-head">
+            <span></span><span>Bulan ini</span><span>Tahun berjalan</span>
+          </div>
+          <div class="pajak-row">
+            <span>Omzet (pendapatan kotor)</span><span id="pOmzetBulan">–</span><span id="pOmzetTahun">–</span>
+          </div>
+          <div class="pajak-row">
+            <span>Total beban operasional</span><span id="pBebanBulan">–</span><span id="pBebanTahun">–</span>
+          </div>
+          <div class="pajak-row pajak-highlight">
+            <span>Laba bersih</span><span id="pLabaBulan">–</span><span id="pLabaTahun">–</span>
+          </div>
+          <div class="pajak-row pajak-dashed">
+            <span>Estimasi PPh Final (0,5% × omzet)</span><span id="pPphBulan">–</span><span id="pPphTahun">–</span>
+          </div>
+        </div>
+        <p class="pajak-disclaimer">*Estimasi umum berdasarkan PP 20/2026 untuk omzet di bawah Rp4,8 miliar/tahun. Bukan pengganti konsultasi resmi ke akuntan/konsultan pajak.</p>
 
-.list-row {
-  display: grid;
-  grid-template-columns: 1.1fr 0.75fr 0.8fr 0.8fr 0.85fr 0.75fr 0.85fr 0.75fr 0.7fr;
-  gap: 6px;
-  align-items: center;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border);
-}
-.list-row-actions { display: flex; gap: 6px; }
-.list-row:last-child { border-bottom: none; }
-.list-head { background: var(--bg-light); font-size: 12px; color: var(--text-muted); font-weight: bold; }
-.list-cell-name { font-size: 14px; font-weight: bold; margin: 0; }
-.list-cell-nik { font-size: 12px; color: var(--text-muted); margin: 2px 0 0; }
-.list-kode { font-weight: bold; color: var(--tosca-dark); font-size: 13px; }
-.badge-mini {
-  font-size: 12px;
-  font-weight: bold;
-  padding: 3px 10px;
-  border-radius: 20px;
-  width: fit-content;
-}
-.badge-tosca { background: var(--tosca-bg); color: var(--tosca-dark); }
-.badge-neutral { background: var(--bg-light); color: var(--text-muted); }
-.badge-danger { background: var(--danger-bg); color: var(--danger); }
-.jatuh-tempo-warn { display: flex; align-items: center; gap: 5px; color: var(--danger); font-weight: bold; }
-.jatuh-tempo-warn .warn-icon { font-size: 14px; }
+        <p class="panel-subtitle">Tren 7 hari terakhir</p>
+        <div class="chart-box">
+          <svg id="trenChart" viewBox="0 0 560 120" style="width:100%;height:110px"></svg>
+          <div class="chart-legend"><span class="legend-tosca">▬ Pemasukan</span><span class="legend-danger">┄ Pengeluaran</span></div>
+        </div>
 
-/* ============ CETAK LABEL ============ */
-.label-search { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 20px; max-width: 420px; }
-.label-search label { font-size: 13px; font-weight: bold; display: block; margin-bottom: 8px; }
-.label-search-row { display: flex; gap: 8px; }
-.label-search-row input {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 14px;
-}
-.label-search-msg { font-size: 12px; color: var(--danger); margin: 8px 0 0; min-height: 14px; }
+        <p class="panel-subtitle">Riwayat transaksi</p>
+        <div class="list-table">
+          <div class="list-row keuangan-row keuangan-head">
+            <span>Tanggal</span><span>Keterangan</span><span>Kategori</span><span>Masuk</span><span>Keluar</span><span>Saldo</span><span>Bukti</span>
+          </div>
+          <div id="riwayatTransaksiBody">
+            <p class="empty-state">Memuat riwayat transaksi...</p>
+          </div>
+        </div>
+      </section>
 
-.label-print-wrap { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
-.label-print-target {
-  width: 100mm;
-  height: 50mm;
-  overflow: hidden;
-  position: relative;
-  background: #fff;
-  border: 2px dashed var(--tosca-solid);
-  border-radius: 10px;
-}
-.label-card {
-  width: 100mm;
-  height: 50mm;
-  transform-origin: top left;
-  background: #fff;
-  overflow: hidden;
-}
-.label-card-head {
-  background: var(--tosca-dark);
-  padding: 8px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.label-brand { font-size: 13px; font-weight: bold; color: #fff; }
-.label-lokasi { font-size: 11px; color: #9FE1CB; }
-.label-card-columns { display: flex; padding: 14px; gap: 16px; }
-.label-col-left { flex: 0 0 42%; display: flex; flex-direction: column; align-items: center; }
-.label-eyebrow { text-align: center; font-size: 10px; color: var(--text-muted); letter-spacing: 0.08em; margin: 0; }
-.label-kode { text-align: center; font-size: 19px; font-weight: bold; color: var(--tosca-dark); letter-spacing: 1.5px; margin: 2px 0 10px; }
-.label-qr { display: flex; justify-content: center; width: 90px; height: 90px; margin: 0 auto; }
-.label-col-right { flex: 1; border-left: 1px dashed var(--border); padding-left: 14px; display: flex; flex-direction: column; justify-content: center; gap: 8px; font-size: 13px; color: var(--text-muted); }
-.label-detail-row { display: flex; justify-content: space-between; gap: 10px; }
-.label-detail-row span:last-child { color: var(--text); font-weight: bold; text-align: right; }
-.btn-print { padding: 10px 18px; }
+      <!-- TAB: ANALISIS ORDERAN -->
+      <section id="tab-analisis" class="tab-panel">
+        <div class="panel-head">
+          <h2>Analisis orderan</h2>
+        </div>
 
-/* ============ REALTIME NOTIF TOAST ============ */
-.notif-toast {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: var(--tosca-dark);
-  color: #fff;
-  padding: 14px 20px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: bold;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-  transform: translateX(140%);
-  transition: transform 0.35s ease;
-  z-index: 9999;
-  max-width: 300px;
-}
-.notif-toast.show { transform: translateX(0); }
+        <div class="stat-grid">
+          <div class="stat-card stat-tosca">
+            <span class="stat-label">Total order (semua waktu)</span>
+            <span id="aTotalOrder" class="stat-value">–</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Rata-rata durasi simpan</span>
+            <span id="aRataDurasi" class="stat-value">–</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">% pakai antar/jemput</span>
+            <span id="aPersenAntarJemput" class="stat-value">–</span>
+          </div>
+          <div class="stat-card stat-alert">
+            <span class="stat-label">Order ditolak</span>
+            <span id="aDitolak" class="stat-value">–</span>
+          </div>
+        </div>
 
-/* ============ PRINT ============ */
-@media print {
-  body.lagi-print > *:not(.cetak-target) { display: none !important; }
-  .cetak-target { position: fixed; top: 0; left: 0; border: none; }
-  .export-pdf-wrap { display: block !important; padding: 20px; }
-}
-.export-pdf-wrap { display: none; }
+        <p class="panel-subtitle">Order per wilayah</p>
+        <div id="analisisWilayah" class="breakdown-box"></div>
 
-/* ============ NOTA ============ */
-.nota-print-target {
-  background: #fff;
-  border: 2px dashed var(--tosca-solid);
-  border-radius: 10px;
-  overflow: hidden;
-  margin: 18px;
-  width: calc(100% - 36px);
-}
-.nota-header { background: var(--tosca-dark); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; }
-.nota-brand { color: #fff; font-size: 14px; font-weight: bold; }
-.nota-lokasi { color: #9FE1CB; font-size: 12px; }
-.nota-body { padding: 20px; text-align: center; }
-.nota-qr { display: flex; justify-content: center; margin-bottom: 10px; }
-.nota-kode { font-size: 22px; font-weight: bold; color: var(--tosca-dark); letter-spacing: 1.5px; margin: 0 0 16px; }
-.nota-rincian { text-align: left; font-size: 13px; color: var(--text-muted); display: flex; flex-direction: column; gap: 6px; max-width: 280px; margin: 0 auto; }
-.nota-row { display: flex; justify-content: space-between; gap: 10px; }
-.nota-row span:last-child { color: var(--text); font-weight: bold; }
-.nota-row.nota-total { font-size: 15px; }
-.nota-row.nota-total span:last-child { color: var(--tosca-dark); }
-.nota-divider { border-top: 1px dashed var(--border); margin: 4px 0; }
-.nota-footer { text-align: center; font-size: 11px; color: var(--text-muted); padding: 0 20px 16px; }
+        <p class="panel-subtitle">Order per ukuran barang</p>
+        <div id="analisisUkuran" class="breakdown-box"></div>
 
-/* ============ KEUANGAN ============ */
-.panel-subtitle { font-size: 13px; font-weight: bold; color: var(--text-muted); margin: 20px 0 10px; }
-.pajak-table { background: #fff; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-.pajak-row { display: grid; grid-template-columns: 1.4fr 1fr 1fr; padding: 10px 16px; font-size: 13px; border-top: 1px solid var(--border); }
-.pajak-row:first-child { border-top: none; }
-.pajak-row span:not(:first-child) { text-align: right; }
-.pajak-head { background: var(--bg-light); font-size: 12px; color: var(--text-muted); font-weight: bold; }
-.pajak-highlight { background: var(--tosca-bg); font-weight: bold; color: var(--tosca-dark); }
-.pajak-dashed { border-top: 1px dashed var(--border); font-size: 12.5px; color: var(--text-muted); }
-.pajak-disclaimer { font-size: 11px; color: var(--text-muted); margin: 8px 0 0; }
+        <p class="panel-subtitle">Tren order masuk — 14 hari terakhir</p>
+        <div class="chart-box">
+          <svg id="trenOrderChart" viewBox="0 0 560 120" style="width:100%;height:110px"></svg>
+        </div>
+      </section>
 
-.chart-box { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; }
-.chart-legend { display: flex; gap: 16px; font-size: 12px; color: var(--text-muted); margin-top: 6px; }
-.legend-tosca { color: var(--tosca-solid); font-weight: bold; }
-.legend-danger { color: var(--danger); font-weight: bold; }
+      <!-- TAB: GALERI -->
+      <section id="tab-galeri" class="tab-panel">
+        <div class="panel-head">
+          <h2>Galeri dokumentasi</h2>
+        </div>
 
-.keuangan-row { grid-template-columns: 0.9fr 1.4fr 0.9fr 0.9fr 0.9fr 0.9fr 0.7fr; }
-.keuangan-head { background: var(--bg-light); font-size: 12px; color: var(--text-muted); font-weight: bold; }
-.keuangan-masuk { color: var(--tosca-dark); font-weight: bold; }
-.keuangan-keluar { color: var(--danger); font-weight: bold; }
-.keuangan-saldo { font-weight: bold; }
+        <div class="label-search">
+          <label for="galeriKodeInput">Cari kode booking</label>
+          <div class="label-search-row">
+            <input type="text" id="galeriKodeInput" placeholder="Contoh: NTB-SBY-0001">
+            <button id="btnCariGaleri" class="btn-tosca-solid">Cari</button>
+          </div>
+          <p id="galeriSearchMsg" class="label-search-msg"></p>
+        </div>
 
-/* ============ ANALISIS ORDERAN ============ */
-.breakdown-box { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; margin-bottom: 4px; }
-.breakdown-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 13px; }
-.breakdown-item:last-child { margin-bottom: 0; }
-.breakdown-label { flex: 0 0 140px; color: var(--text); }
-.breakdown-bar-wrap { flex: 1; background: var(--bg-light); border-radius: 6px; height: 18px; overflow: hidden; }
-.breakdown-bar { background: var(--tosca-solid); height: 100%; border-radius: 6px; }
-.breakdown-count { flex: 0 0 40px; text-align: right; font-weight: bold; color: var(--tosca-dark); }
+        <div id="galeriArea" style="display:none">
+          <div class="panel-head" style="margin-top:10px">
+            <div class="galeri-tabs">
+              <button class="galeri-tab-btn active" data-tipe="checkin">Checkin</button>
+              <button class="galeri-tab-btn" data-tipe="checkout">Checkout</button>
+            </div>
+            <button id="btnHapusSemuaFoto" class="btn btn-icon" title="Hapus semua foto kode ini">🗑️ Hapus semua foto</button>
+          </div>
+          <div id="galeriCheckoutBanner" class="galeri-checkout-banner" style="display:none">⚠️ Upload minimal 1 foto checkout sebelum bisa konfirmasi selesai</div>
+          <div id="galeriGrid" class="galeri-grid"></div>
+          <p class="pajak-disclaimer">Foto otomatis dikompres saat diunggah untuk hemat penyimpanan.</p>
+          <button id="btnKonfirmasiCheckout" class="btn btn-tosca-solid" style="display:none;width:100%;margin-top:12px" disabled>✅ Konfirmasi Checkout Selesai</button>
+        </div>
+      </section>
 
-/* ============ GALERI ============ */
-.galeri-tabs { display: flex; gap: 8px; }
-.galeri-tab-btn { background: var(--bg-light); border: none; border-radius: 20px; padding: 7px 18px; font-size: 13px; font-weight: bold; color: var(--text-muted); cursor: pointer; }
-.galeri-tab-btn.active { background: var(--tosca-solid); color: #fff; }
-.galeri-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-top: 14px; }
-.galeri-thumb { position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 1; background: var(--bg-light); }
-.galeri-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.galeri-upload-tile { border: 2px dashed var(--border); border-radius: 8px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted); font-size: 26px; background: #fff; position: relative; }
-.galeri-upload-tile input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    </div>
+  </div>
 
-/* ============ MODAL EDIT ORDERAN ============ */
-.edit-modal-overlay {
-  display: none;
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.5);
-  z-index: 10000;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-.edit-modal-overlay.show { display: flex; }
-.edit-modal {
-  background: #fff;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 380px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-.edit-modal-head {
-  background: var(--tosca-dark);
-  color: #fff;
-  padding: 14px 18px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 14px;
-  font-weight: bold;
-}
-.edit-modal-close { background: transparent; border: none; color: #9FE1CB; font-size: 18px; cursor: pointer; }
-.edit-modal-body { padding: 18px; display: flex; flex-direction: column; gap: 12px; }
-.edit-field label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 5px; }
-.edit-field input, .edit-field select {
-  width: 100%;
-  padding: 9px 10px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: inherit;
-}
-.edit-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.edit-modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 4px; }
+  <!-- MODAL TAMBAH PENGELUARAN -->
+  <div id="pengeluaranModalOverlay" class="edit-modal-overlay">
+    <div class="edit-modal">
+      <div class="edit-modal-head">
+        <span>Tambah pengeluaran</span>
+        <button id="btnTutupPengeluaran" class="edit-modal-close" aria-label="Tutup">✕</button>
+      </div>
+      <form id="formPengeluaran" class="edit-modal-body">
+        <div class="edit-field">
+          <label>Tanggal</label>
+          <input type="date" id="pengeluaranTanggal" required>
+        </div>
+        <div class="edit-field">
+          <label>Keterangan</label>
+          <input type="text" id="pengeluaranKeterangan" placeholder="Contoh: Beli plastik & label" required>
+        </div>
+        <div class="edit-field">
+          <label>Cabang / Point</label>
+          <select id="pengeluaranLokasi">
+            <option value="">Umum (semua cabang)</option>
+            <option value="Surabaya">Surabaya</option>
+            <option value="Sidoarjo">Sidoarjo</option>
+            <option value="Sidoarjo 2 (Back Up)">Sidoarjo 2</option>
+          </select>
+        </div>
+        <div class="edit-field">
+          <label>Kategori</label>
+          <select id="pengeluaranKategori" required>
+            <option value="__baru__">＋ Tambah kategori baru...</option>
+          </select>
+        </div>
+        <div class="edit-field" id="wrapKategoriBaru" style="display:none">
+          <label>Nama kategori baru</label>
+          <input type="text" id="pengeluaranKategoriBaru" placeholder="Contoh: Transport">
+        </div>
+        <div class="edit-field">
+          <label>Jumlah (Rp)</label>
+          <input type="number" id="pengeluaranJumlah" min="0" required>
+        </div>
+        <div class="edit-field">
+          <label>Foto bukti nota / transfer (wajib)</label>
+          <input type="file" id="pengeluaranBukti" accept="image/*" required>
+          <img id="pengeluaranBuktiPreview" style="display:none;max-width:100%;border-radius:8px;margin-top:8px">
+        </div>
+        <div class="edit-modal-actions">
+          <button type="button" id="btnBatalPengeluaran" class="btn btn-ghost">Batal</button>
+          <button type="submit" id="btnSimpanPengeluaran" class="btn btn-tosca-solid">Simpan pengeluaran</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- REALTIME NOTIF TOAST -->
+  <div id="notifToast" class="notif-toast"></div>
+
+  <!-- MODAL EDIT ORDERAN -->
+  <div id="editModalOverlay" class="edit-modal-overlay">
+    <div class="edit-modal">
+      <div class="edit-modal-head">
+        <span>Sunting data orderan</span>
+        <button id="btnTutupEdit" class="edit-modal-close" aria-label="Tutup">✕</button>
+      </div>
+      <form id="formEdit" class="edit-modal-body">
+        <input type="hidden" id="editId">
+        <div class="edit-field">
+          <label>Nama lengkap</label>
+          <input type="text" id="editNama" required>
+        </div>
+        <div class="edit-field">
+          <label>Nomor WhatsApp</label>
+          <input type="text" id="editWa" required>
+        </div>
+        <div class="edit-field">
+          <label>Barang yang dititipkan</label>
+          <input type="text" id="editDeskripsi" required>
+        </div>
+        <div class="edit-field-row">
+          <div class="edit-field">
+            <label>Ukuran</label>
+            <select id="editUkuran">
+              <option value="Kecil-S">Kecil - S</option>
+              <option value="Sedang-M">Sedang - M</option>
+              <option value="Besar-L">Besar - L</option>
+              <option value="Sangat Besar-XL">Sangat Besar - XL</option>
+              <option value="Super Besar-XXL+">Super Besar - XXL+</option>
+            </select>
+          </div>
+          <div class="edit-field">
+            <label>Jumlah hari</label>
+            <input type="number" id="editHari" min="1" required>
+          </div>
+        </div>
+        <div class="edit-field">
+          <label>Layanan antar/jemput</label>
+          <select id="editLayanan">
+            <option value="Tidak, Terimakasih">Tidak, Terimakasih</option>
+            <option value="Penjemputan (+3.000/km)">Penjemputan</option>
+            <option value="Pengantaran (+3.000/km)">Pengantaran</option>
+            <option value="+ Keduanya (+5.000/km)">Antar + Jemput</option>
+          </select>
+        </div>
+        <div class="edit-field">
+          <label>No. identitas (6 angka terakhir)</label>
+          <input type="text" id="editIdentitas" pattern="[0-9]{6}" maxlength="6" required>
+        </div>
+        <div class="edit-modal-actions">
+          <button type="button" id="btnBatalEdit" class="btn btn-ghost">Batal</button>
+          <button type="submit" class="btn btn-tosca-solid">Simpan perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL NOTA -->
+  <div id="notaModalOverlay" class="edit-modal-overlay">
+    <div class="edit-modal">
+      <div class="edit-modal-head">
+        <span>Nota booking</span>
+        <button id="btnTutupNota" class="edit-modal-close" aria-label="Tutup">✕</button>
+      </div>
+      <div id="notaPrintTarget" class="nota-print-target cetak-target">
+        <div class="nota-header">
+          <span class="nota-brand">NitipBox</span>
+          <span id="notaLokasi" class="nota-lokasi">–</span>
+        </div>
+        <div class="nota-body">
+          <div id="notaQR" class="nota-qr"></div>
+          <p id="notaKode" class="nota-kode">NTB-0000</p>
+          <div class="nota-rincian">
+            <div class="nota-row"><span>Tanggal masuk</span><span id="notaTanggal">–</span></div>
+            <div class="nota-row"><span>Durasi</span><span id="notaDurasi">–</span></div>
+            <div class="nota-row"><span>Layanan</span><span id="notaLayanan">–</span></div>
+            <div class="nota-divider"></div>
+            <div class="nota-row"><span>Tarif dasar</span><span id="notaDasar">–</span></div>
+            <div class="nota-row"><span>Diskon</span><span id="notaDiskon">–</span></div>
+            <div class="nota-row nota-total"><span>Total bayar</span><span id="notaTotal">–</span></div>
+            <div class="nota-row"><span>Minimal DP (30%)</span><span id="notaDp">–</span></div>
+          </div>
+        </div>
+        <p class="nota-footer">Simpan nota ini sebagai bukti booking Anda.</p>
+      </div>
+      <div class="edit-modal-actions" style="padding:0 18px 18px">
+        <button type="button" id="btnCetakNota" class="btn btn-tosca-solid">🖨️ Cetak / simpan nota</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL TAMBAH PEMASUKAN LAIN -->
+  <div id="pemasukanModalOverlay" class="edit-modal-overlay">
+    <div class="edit-modal">
+      <div class="edit-modal-head">
+        <span>Tambah pemasukan lain</span>
+        <button id="btnTutupPemasukan" class="edit-modal-close" aria-label="Tutup">✕</button>
+      </div>
+      <form id="formPemasukan" class="edit-modal-body">
+        <div class="edit-field">
+          <label>Tanggal</label>
+          <input type="date" id="pemasukanTanggal" required>
+        </div>
+        <div class="edit-field">
+          <label>Keterangan</label>
+          <input type="text" id="pemasukanKeterangan" placeholder="Contoh: Setor modal awal" required>
+        </div>
+        <div class="edit-field">
+          <label>Cabang / Point</label>
+          <select id="pemasukanLokasi">
+            <option value="">Umum (semua cabang)</option>
+            <option value="Surabaya">Surabaya</option>
+            <option value="Sidoarjo">Sidoarjo</option>
+            <option value="Sidoarjo 2 (Back Up)">Sidoarjo 2</option>
+          </select>
+        </div>
+        <div class="edit-field">
+          <label>Jumlah (Rp)</label>
+          <input type="number" id="pemasukanJumlah" min="0" required>
+        </div>
+        <div class="edit-modal-actions">
+          <button type="button" id="btnBatalPemasukan" class="btn btn-ghost">Batal</button>
+          <button type="submit" class="btn btn-tosca-solid">Simpan pemasukan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL SCANNER QR CHECKOUT -->
+  <div id="scannerModalOverlay" class="edit-modal-overlay">
+    <div class="edit-modal scanner-modal">
+      <div class="edit-modal-head">
+        <span>Scan untuk checkout</span>
+        <button id="btnTutupScanner" class="edit-modal-close" aria-label="Tutup">✕</button>
+      </div>
+      <div class="edit-modal-body">
+        <div id="qrReaderBox"></div>
+        <p id="scannerMsg" class="label-search-msg"></p>
+        <p class="scanner-manual-toggle" id="btnToggleManual">Tidak bisa scan? Input kode manual</p>
+        <div id="wrapManualKode" style="display:none">
+          <div class="label-search-row">
+            <input type="text" id="manualKodeInput" placeholder="Contoh: NTB-SBY-0001">
+            <button id="btnKirimManualKode" class="btn-tosca-solid">Lanjut</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
