@@ -6,9 +6,16 @@
 <title>NitipBox Admin</title>
 <link rel="stylesheet" href="admin.css">
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
+
+  <!-- TOP BAR MOBILE -->
+  <div id="mobileTopbar" class="mobile-topbar">
+    <span class="mobile-topbar-brand">NitipBox admin</span>
+    <button id="btnLogoutMobile" class="mobile-topbar-logout" aria-label="Keluar">⏻</button>
+  </div>
 
   <!-- LOGIN SCREEN -->
   <div id="loginScreen" class="login-screen">
@@ -102,6 +109,7 @@
         </div>
 
         <div class="filter-bar">
+          <input type="text" id="searchListOrderan" placeholder="🔍 Cari nama, kode, atau barang..." class="search-input">
           <select id="filterWilayah">
             <option value="semua">Semua wilayah</option>
             <option value="Surabaya">Surabaya (SBY)</option>
@@ -117,6 +125,7 @@
             <option value="terbaru">Order terbaru</option>
             <option value="terlama">Order terlama</option>
           </select>
+          <button id="btnScanCheckout" class="btn btn-tosca-solid">📷 Scan untuk Checkout</button>
         </div>
 
         <div class="list-table">
@@ -325,8 +334,10 @@
             </div>
             <button id="btnHapusSemuaFoto" class="btn btn-icon" title="Hapus semua foto kode ini">🗑️ Hapus semua foto</button>
           </div>
+          <div id="galeriCheckoutBanner" class="galeri-checkout-banner" style="display:none">⚠️ Upload minimal 1 foto checkout sebelum bisa konfirmasi selesai</div>
           <div id="galeriGrid" class="galeri-grid"></div>
           <p class="pajak-disclaimer">Foto otomatis dikompres saat diunggah untuk hemat penyimpanan.</p>
+          <button id="btnKonfirmasiCheckout" class="btn btn-tosca-solid" style="display:none;width:100%;margin-top:12px" disabled>✅ Konfirmasi Checkout Selesai</button>
         </div>
       </section>
 
@@ -374,7 +385,7 @@
         </div>
         <div class="edit-field">
           <label>Foto bukti nota / transfer (wajib)</label>
-          <input type="file" id="pengeluaranBukti" accept="image/*" capture="environment" required>
+          <input type="file" id="pengeluaranBukti" accept="image/*" required>
           <img id="pengeluaranBuktiPreview" style="display:none;max-width:100%;border-radius:8px;margin-top:8px">
         </div>
         <div class="edit-modal-actions">
@@ -514,6 +525,27 @@
           <button type="submit" class="btn btn-tosca-solid">Simpan pemasukan</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- MODAL SCANNER QR CHECKOUT -->
+  <div id="scannerModalOverlay" class="edit-modal-overlay">
+    <div class="edit-modal scanner-modal">
+      <div class="edit-modal-head">
+        <span>Scan untuk checkout</span>
+        <button id="btnTutupScanner" class="edit-modal-close" aria-label="Tutup">✕</button>
+      </div>
+      <div class="edit-modal-body">
+        <div id="qrReaderBox"></div>
+        <p id="scannerMsg" class="label-search-msg"></p>
+        <p class="scanner-manual-toggle" id="btnToggleManual">Tidak bisa scan? Input kode manual</p>
+        <div id="wrapManualKode" style="display:none">
+          <div class="label-search-row">
+            <input type="text" id="manualKodeInput" placeholder="Contoh: NTB-SBY-0001">
+            <button id="btnKirimManualKode" class="btn-tosca-solid">Lanjut</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
