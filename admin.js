@@ -495,6 +495,46 @@ document.getElementById('btnPrintLabel').addEventListener('click', function() {
   cetakElemen('labelPrintTarget');
 });
 
+var CSS_PRINT_LABEL_NOTA =
+  'body{margin:0;padding:18px;background:#fff;font-family:Segoe UI,Arial,sans-serif}' +
+  '.label-print-target{overflow:hidden;position:relative;background:#fff;border:2px dashed #00b89c;border-radius:10px}' +
+  '.label-card{transform-origin:top left;background:#fff;overflow:hidden}' +
+  '.label-card-head{background:#005a4e;padding:8px 14px;display:flex;align-items:center;justify-content:space-between}' +
+  '.label-brand{font-size:13px;font-weight:bold;color:#fff}' +
+  '.label-lokasi{font-size:11px;color:#9FE1CB}' +
+  '.label-card-columns{display:flex;padding:14px;gap:16px}' +
+  '.label-col-left{flex:0 0 42%;display:flex;flex-direction:column;align-items:center}' +
+  '.label-eyebrow{text-align:center;font-size:10px;color:#888;letter-spacing:.08em;margin:0}' +
+  '.label-kode{text-align:center;font-size:19px;font-weight:bold;color:#005a4e;letter-spacing:1.5px;margin:2px 0 10px}' +
+  '.label-qr{display:flex;justify-content:center;width:90px;height:90px;margin:0 auto}' +
+  '.label-col-right{flex:1;border-left:1px dashed #e0e0e0;padding-left:14px;display:flex;flex-direction:column;justify-content:center;gap:8px;font-size:13px;color:#888}' +
+  '.label-detail-row{display:flex;justify-content:space-between;gap:10px}' +
+  '.label-detail-row span:last-child{color:#333;font-weight:bold;text-align:right}' +
+  '.nota-print-target{background:#fff;border:2px dashed #00b89c;border-radius:10px;overflow:hidden;width:100%}' +
+  '.nota-header{background:#005a4e;padding:10px 16px;display:flex;justify-content:space-between;align-items:center}' +
+  '.nota-brand{color:#fff;font-size:14px;font-weight:bold}' +
+  '.nota-lokasi{color:#9FE1CB;font-size:12px}' +
+  '.nota-body{padding:20px;text-align:center}' +
+  '.nota-qr{display:flex;justify-content:center;margin-bottom:10px}' +
+  '.nota-kode{font-size:22px;font-weight:bold;color:#005a4e;letter-spacing:1.5px;margin:0 0 16px}' +
+  '.nota-rincian{text-align:left;font-size:13px;color:#888;display:flex;flex-direction:column;gap:6px;max-width:280px;margin:0 auto}' +
+  '.nota-row{display:flex;justify-content:space-between;gap:10px}' +
+  '.nota-row span:last-child{color:#333;font-weight:bold}' +
+  '.nota-row.nota-total{font-size:15px}' +
+  '.nota-row.nota-total span:last-child{color:#005a4e}' +
+  '.nota-divider{border-top:1px dashed #e0e0e0;margin:4px 0}' +
+  '.nota-footer{text-align:center;font-size:11px;color:#888;padding:0 20px 16px}';
+
+var CSS_PRINT_KEUANGAN =
+  'body{margin:0;padding:24px;background:#fff;font-family:Segoe UI,Arial,sans-serif}' +
+  '.list-table{border:1px solid #e0e0e0;border-radius:10px;overflow:hidden}' +
+  '.list-row{display:grid;gap:6px;align-items:center;padding:10px 14px;border-bottom:1px solid #e0e0e0}' +
+  '.keuangan-row{grid-template-columns:0.9fr 1.4fr 0.9fr 0.9fr 0.9fr 0.9fr 0.7fr}' +
+  '.keuangan-head{background:#f4f7f6;font-size:12px;color:#888;font-weight:bold}' +
+  '.keuangan-masuk{color:#005a4e;font-weight:bold}' +
+  '.keuangan-keluar{color:#c62828;font-weight:bold}' +
+  '.keuangan-saldo{font-weight:bold}';
+
 function cetakElemen(id) {
   var target = document.getElementById(id);
   var clone = target.cloneNode(true);
@@ -517,8 +557,7 @@ function cetakElemen(id) {
   var jendela = window.open('', '_blank', 'width=420,height=640');
   jendela.document.write(
     '<!DOCTYPE html><html><head><meta charset="utf-8">' +
-    '<link rel="stylesheet" href="admin.css">' +
-    '<style>' + pageSizeCss + ' body{margin:0;padding:18px;background:#fff}</style>' +
+    '<style>' + CSS_PRINT_LABEL_NOTA + ' ' + pageSizeCss + '</style>' +
     '</head><body>' + clone.outerHTML + '</body></html>'
   );
   jendela.document.close();
@@ -930,8 +969,7 @@ document.getElementById('btnExportPdf').addEventListener('click', function() {
   var jendela = window.open('', '_blank', 'width=700,height=700');
   jendela.document.write(
     '<!DOCTYPE html><html><head><meta charset="utf-8">' +
-    '<link rel="stylesheet" href="admin.css">' +
-    '<style>body{margin:0;padding:24px;background:#fff}</style>' +
+    '<style>' + CSS_PRINT_KEUANGAN + '</style>' +
     '</head><body>' + isiHtml + '</body></html>'
   );
   jendela.document.close();
