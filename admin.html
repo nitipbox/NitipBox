@@ -107,9 +107,10 @@
         <div class="list-table">
           <div class="list-row list-head">
             <span>Pelanggan</span>
-            <span>Kode label</span>
+            <span>Barang</span>
             <span>Tipe order</span>
             <span>Antar/jemput</span>
+            <span>Tarif</span>
             <span>Jatuh tempo</span>
             <span>Status</span>
           </div>
@@ -132,6 +133,16 @@
             <button id="btnCariLabel" class="btn-tosca-solid">Cari</button>
           </div>
           <p id="labelSearchMsg" class="label-search-msg"></p>
+
+          <label for="labelUkuranKertas" style="margin-top:14px">Ukuran printer thermal</label>
+          <select id="labelUkuranKertas">
+            <option value="30x20">30 × 20 mm</option>
+            <option value="40x30">40 × 30 mm</option>
+            <option value="50x30" selected>50 × 30 mm (default)</option>
+            <option value="58x40">58 × 40 mm</option>
+            <option value="100x50">100 × 50 mm</option>
+          </select>
+          <p class="label-search-msg" style="color:var(--text-muted)">Ukuran kertas print menyesuaikan otomatis saat cetak.</p>
         </div>
 
         <div id="labelPrintArea" class="label-print-wrap" style="display:none">
@@ -162,6 +173,64 @@
 
   <!-- REALTIME NOTIF TOAST -->
   <div id="notifToast" class="notif-toast"></div>
+
+  <!-- MODAL EDIT ORDERAN -->
+  <div id="editModalOverlay" class="edit-modal-overlay">
+    <div class="edit-modal">
+      <div class="edit-modal-head">
+        <span>Sunting data orderan</span>
+        <button id="btnTutupEdit" class="edit-modal-close" aria-label="Tutup">✕</button>
+      </div>
+      <form id="formEdit" class="edit-modal-body">
+        <input type="hidden" id="editId">
+        <div class="edit-field">
+          <label>Nama lengkap</label>
+          <input type="text" id="editNama" required>
+        </div>
+        <div class="edit-field">
+          <label>Nomor WhatsApp</label>
+          <input type="text" id="editWa" required>
+        </div>
+        <div class="edit-field">
+          <label>Barang yang dititipkan</label>
+          <input type="text" id="editDeskripsi" required>
+        </div>
+        <div class="edit-field-row">
+          <div class="edit-field">
+            <label>Ukuran</label>
+            <select id="editUkuran">
+              <option value="Kecil-S">Kecil - S</option>
+              <option value="Sedang-M">Sedang - M</option>
+              <option value="Besar-L">Besar - L</option>
+              <option value="Sangat Besar-XL">Sangat Besar - XL</option>
+              <option value="Super Besar-XXL+">Super Besar - XXL+</option>
+            </select>
+          </div>
+          <div class="edit-field">
+            <label>Jumlah hari</label>
+            <input type="number" id="editHari" min="1" required>
+          </div>
+        </div>
+        <div class="edit-field">
+          <label>Layanan antar/jemput</label>
+          <select id="editLayanan">
+            <option value="Tidak, Terimakasih">Tidak, Terimakasih</option>
+            <option value="Penjemputan (+3.000/km)">Penjemputan</option>
+            <option value="Pengantaran (+3.000/km)">Pengantaran</option>
+            <option value="+ Keduanya (+5.000/km)">Antar + Jemput</option>
+          </select>
+        </div>
+        <div class="edit-field">
+          <label>No. identitas (6 angka terakhir)</label>
+          <input type="text" id="editIdentitas" pattern="[0-9]{6}" maxlength="6" required>
+        </div>
+        <div class="edit-modal-actions">
+          <button type="button" id="btnBatalEdit" class="btn btn-ghost">Batal</button>
+          <button type="submit" class="btn btn-tosca-solid">Simpan perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script src="admin.js"></script>
 </body>
