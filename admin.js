@@ -346,9 +346,14 @@ async function cariDanTampilkanLabel() {
   document.getElementById('labelUkuran').textContent = data.ukuran.replace('-', ' - ');
   document.getElementById('labelMasuk').textContent = new Date(data.tanggal_masuk).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-  JsBarcode('#labelBarcode', data.kode, { format: 'CODE128', width: 2, height: 50, displayValue: false, margin: 0 });
-
   area.style.display = 'flex';
+
+  try {
+    JsBarcode('#labelBarcode', data.kode, { format: 'CODE128', width: 2, height: 50, displayValue: false, margin: 0 });
+  } catch (err) {
+    console.error('Gagal membuat barcode:', err);
+    msg.textContent = 'Label tampil, tapi barcode gagal dibuat (cek koneksi internet).';
+  }
 }
 
 document.getElementById('btnPrintLabel').addEventListener('click', function() {
@@ -367,7 +372,10 @@ document.getElementById('btnPrintLabel').addEventListener('click', function() {
 /* =============================================
    REALTIME NOTIFIKASI ORDER BARU
    ============================================= */
+var _realtimeAktif = false;
 function aktifkanRealtimeNotif() {
+  if (_realtimeAktif) return;
+  _realtimeAktif = true;
   db.channel('titipan-realtime')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'titipan' }, function(payload) {
       mainkanSuaraNotif();
