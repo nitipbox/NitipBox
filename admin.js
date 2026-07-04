@@ -155,6 +155,7 @@ function muatSemuaData() {
   muatVerifikasi();
   muatListOrderan();
   muatKeuangan();
+  muatAnalisis();
 }
 
 /* =============================================
@@ -545,9 +546,10 @@ document.getElementById('filterCabangKeuangan').addEventListener('change', funct
 async function muatKeuangan() {
   await muatKategoriPengeluaran();
 
-  const [{ data: aktifRows }, { data: pengeluaranRows }] = await Promise.all([
+  const [{ data: aktifRows }, { data: pengeluaranRows }, { data: pemasukanLainRows }] = await Promise.all([
     db.from('titipan').select('kode, nama, ukuran, hari, lokasi, created_at').eq('status', 'aktif'),
-    db.from('pengeluaran').select('*')
+    db.from('pengeluaran').select('*'),
+    db.from('pemasukan_lain').select('*')
   ]);
 
   var ledger = [];
@@ -558,6 +560,17 @@ async function muatKeuangan() {
       kategori: 'Booking',
       lokasi: row.lokasi || '',
       masuk: hitungTarif(row.ukuran, row.hari),
+      keluar: 0,
+      bukti: null
+    });
+  });
+  (pemasukanLainRows || []).forEach(function(row) {
+    ledger.push({
+      tanggal: new Date(row.tanggal),
+      keterangan: row.keterangan,
+      kategori: 'Pemasukan Lain',
+      lokasi: row.lokasi || '',
+      masuk: Number(row.jumlah),
       keluar: 0,
       bukti: null
     });
@@ -755,6 +768,34 @@ function kompresGambar(file, maxDim, kualitas) {
 }
 
 /* =============================================
+   MODAL TAMBAH PEMASUKAN LAIN
+   ============================================= */
+document.getElementById('btnTambahPemasukan').addEventListener('click', function() {
+  document.getElementById('formPemasukan').reset();
+  document.getElementById('pemasukanTanggal').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('pemasukanModalOverlay').classList.add('show');
+});
+function tutupPemasukanModal() {
+  document.getElementById('pemasukanModalOverlay').classList.remove('show');
+}
+document.getElementById('btnTutupPemasukan').addEventListener('click', tutupPemasukanModal);
+document.getElementById('btnBatalPemasukan').addEventListener('click', tutupPemasukanModal);
+document.getElementById('pemasukanModalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) tutupPemasukanModal();
+});
+document.getElementById('formPemasukan').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  await db.from('pemasukan_lain').insert({
+    tanggal: document.getElementById('pemasukanTanggal').value,
+    keterangan: document.getElementById('pemasukanKeterangan').value,
+    lokasi: document.getElementById('pemasukanLokasi').value || null,
+    jumlah: parseFloat(document.getElementById('pemasukanJumlah').value) || 0
+  });
+  tutupPemasukanModal();
+  muatKeuangan();
+});
+
+/* =============================================
    MODAL TAMBAH PENGELUARAN
    ============================================= */
 document.getElementById('btnTambahPengeluaran').addEventListener('click', function() {
@@ -847,6 +888,159 @@ document.getElementById('btnExportPdf').addEventListener('click', function() {
   window.addEventListener('afterprint', bersihkan);
 
   window.print();
+});
+
+/* =============================================
+   TAB: ANALISIS ORDERAN
+   ============================================= */
+async function muatAnalisis() {
+  const { data } = await db.from('titipan').select('status, ukuran, hari, lokasi, layanan, created_at');
+  var semua = data || [];
+  var aktif = semua.filter(function(r) { return r.status === 'aktif'; });
+  var ditolak = semua.filter(function(r) { return r.status === 'ditolak'; });
+
+  document.getElementById('aTotalOrder').textContent = semua.length;
+  document.getElementById('aDitolak').textContent = ditolak.length;
+
+  var totalHari = aktif.reduce(function(s, r) { return s + (r.hari || 0); }, 0);
+  var rataDurasi = aktif.length ? (totalHari / aktif.length).toFixed(1) : 0;
+  document.getElementById('aRataDurasi').textContent = rataDurasi + ' hari';
+
+  var pakaiAntarJemput = aktif.filter(function(r) { return r.layanan && r.layanan.indexOf('Tidak') === -1; }).length;
+  var persenAj = aktif.length ? Math.round((pakaiAntarJemput / aktif.length) * 100) : 0;
+  document.getElementById('aPersenAntarJemput').textContent = persenAj + '%';
+
+  renderBreakdown('analisisWilayah', aktif, function(r) { return prefixLokasi[r.lokasi] || r.lokasi || 'Lainnya'; });
+  renderBreakdown('analisisUkuran', aktif, function(r) { return (r.ukuran || 'Lainnya').split('-')[0]; });
+  renderTrenOrderChart(semua);
+}
+
+function renderBreakdown(elId, rows, ambilKunci) {
+  var hitung = {};
+  rows.forEach(function(r) {
+    var kunci = ambilKunci(r);
+    hitung[kunci] = (hitung[kunci] || 0) + 1;
+  });
+  var entries = Object.keys(hitung).map(function(k) { return [k, hitung[k]]; }).sort(function(a, b) { return b[1] - a[1]; });
+  var maxVal = entries.length ? entries[0][1] : 1;
+
+  var wrap = document.getElementById(elId);
+  if (entries.length === 0) { wrap.innerHTML = '<p class="empty-state">Belum ada data.</p>'; return; }
+  wrap.innerHTML = entries.map(function(e) {
+    var lebar = Math.round((e[1] / maxVal) * 100);
+    return '<div class="breakdown-item"><span class="breakdown-label">' + e[0] + '</span>' +
+      '<div class="breakdown-bar-wrap"><div class="breakdown-bar" style="width:' + lebar + '%"></div></div>' +
+      '<span class="breakdown-count">' + e[1] + '</span></div>';
+  }).join('');
+}
+
+function renderTrenOrderChart(rows) {
+  var jumlahHarian = [];
+  for (var i = 13; i >= 0; i--) {
+    var d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() - i);
+    var jumlah = 0;
+    rows.forEach(function(r) {
+      var t = new Date(r.created_at); t.setHours(0,0,0,0);
+      if (t.getTime() === d.getTime()) jumlah++;
+    });
+    jumlahHarian.push(jumlah);
+  }
+  var maxVal = Math.max.apply(null, jumlahHarian.concat([1]));
+  var titik = jumlahHarian.map(function(v, i) {
+    var x = (560 / 13) * i;
+    var y = 110 - (v / maxVal) * 100;
+    return x + ',' + y;
+  }).join(' ');
+  document.getElementById('trenOrderChart').innerHTML = '<polyline points="' + titik + '" fill="none" stroke="#00b89c" stroke-width="3"/>';
+}
+
+/* =============================================
+   TAB: GALERI
+   ============================================= */
+var _galeriKodeAktif = '';
+var _galeriTipeAktif = 'checkin';
+
+document.getElementById('btnCariGaleri').addEventListener('click', cariGaleri);
+document.getElementById('galeriKodeInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') cariGaleri();
+});
+
+async function cariGaleri() {
+  var kode = document.getElementById('galeriKodeInput').value.trim().toUpperCase();
+  var msg = document.getElementById('galeriSearchMsg');
+  msg.textContent = '';
+  if (!kode) { msg.textContent = 'Masukkan kode booking dulu.'; return; }
+
+  const { data } = await db.from('titipan').select('kode').eq('kode', kode).maybeSingle();
+  if (!data) {
+    document.getElementById('galeriArea').style.display = 'none';
+    msg.textContent = 'Kode booking tidak ditemukan.';
+    return;
+  }
+
+  _galeriKodeAktif = kode;
+  _galeriTipeAktif = 'checkin';
+  document.querySelectorAll('.galeri-tab-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.tipe === 'checkin'); });
+  document.getElementById('galeriArea').style.display = 'block';
+  muatGaleriGrid();
+}
+
+document.querySelectorAll('.galeri-tab-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.galeri-tab-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    _galeriTipeAktif = btn.dataset.tipe;
+    muatGaleriGrid();
+  });
+});
+
+async function muatGaleriGrid() {
+  const { data } = await db.from('galeri_foto').select('*').eq('kode', _galeriKodeAktif).eq('tipe', _galeriTipeAktif).order('created_at', { ascending: true });
+  var grid = document.getElementById('galeriGrid');
+  grid.innerHTML = '';
+
+  (data || []).forEach(function(row) {
+    var div = document.createElement('div');
+    div.className = 'galeri-thumb';
+    div.innerHTML = '<img src="' + row.url + '" alt="Foto dokumentasi">';
+    grid.appendChild(div);
+  });
+
+  var uploadTile = document.createElement('div');
+  uploadTile.className = 'galeri-upload-tile';
+  uploadTile.innerHTML = '＋<input type="file" accept="image/*" capture="environment" id="galeriUploadInput">';
+  grid.appendChild(uploadTile);
+
+  document.getElementById('galeriUploadInput').addEventListener('change', uploadFotoGaleri);
+}
+
+async function uploadFotoGaleri(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  try {
+    var blob = await kompresGambar(file, 1000, 0.7);
+    var namaFile = _galeriKodeAktif + '/' + _galeriTipeAktif + '/' + Date.now() + '.jpg';
+    const { error: uploadError } = await db.storage.from('galeri-dokumentasi').upload(namaFile, blob, { contentType: 'image/jpeg' });
+    if (uploadError) throw uploadError;
+    const { data: urlData } = db.storage.from('galeri-dokumentasi').getPublicUrl(namaFile);
+    await db.from('galeri_foto').insert({ kode: _galeriKodeAktif, tipe: _galeriTipeAktif, url: urlData.publicUrl });
+    muatGaleriGrid();
+  } catch (err) {
+    console.error('Gagal upload foto galeri:', err);
+    alert('Gagal upload foto: ' + err.message);
+  }
+}
+
+document.getElementById('btnHapusSemuaFoto').addEventListener('click', async function() {
+  if (!confirm('Hapus SEMUA foto (checkin & checkout) untuk kode ' + _galeriKodeAktif + '? Tindakan ini tidak bisa dibatalkan.')) return;
+  const { data } = await db.from('galeri_foto').select('*').eq('kode', _galeriKodeAktif);
+  var pathList = (data || []).map(function(row) {
+    var idx = row.url.indexOf('galeri-dokumentasi/');
+    return idx !== -1 ? row.url.substring(idx + 'galeri-dokumentasi/'.length) : null;
+  }).filter(Boolean);
+  if (pathList.length) await db.storage.from('galeri-dokumentasi').remove(pathList);
+  await db.from('galeri_foto').delete().eq('kode', _galeriKodeAktif);
+  muatGaleriGrid();
 });
 
 /* =============================================
