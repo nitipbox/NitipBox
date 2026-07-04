@@ -1,10 +1,11 @@
 // ⚠️ Baris SUPABASE_URL sudah diisi sesuai project Supabase NitipBox kamu.
 // Baris SUPABASE_KEY WAJIB kamu isi sendiri dari: Supabase Dashboard > Settings > API > "anon public" key
 const SUPABASE_URL = 'https://tevehzihkqhqmxlrtdhl.supabase.co'
-const SUPABASE_KEY = 'sb_publishable_NMoOIVW_lTA1lMsdkG2x1A_Qj0iRFIu'
+const SUPABASE_KEY = 'sb_publishable_NMoOIVW_lTA1lMsdkG2x1A_Qj0iRFIu''
 const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
 
 var basisTarif = { "Kecil-S": 3000, "Sedang-M": 7000, "Besar-L": 12000, "Sangat Besar-XL": 20000, "Super Besar-XXL+": 50000 };
+var prefixLokasi = { "Surabaya": "SBY", "Sidoarjo": "SDA01", "Sidoarjo 2 (Back Up)": "SDA02" };
 
 /* =============================================
    NOTIFIKASI SUARA (Web Audio API, tanpa file audio)
@@ -272,48 +273,79 @@ document.getElementById('formEdit').addEventListener('submit', async function(e)
 /* =============================================
    TAB: LIST ORDERAN
    ============================================= */
+var _listOrderanCache = [];
+
+document.getElementById('filterWilayah').addEventListener('change', renderListOrderan);
+document.getElementById('filterStatus').addEventListener('change', renderListOrderan);
+document.getElementById('filterUrutan').addEventListener('change', renderListOrderan);
+
 async function muatListOrderan() {
   const { data } = await db.from('titipan').select('*').eq('status', 'aktif').order('created_at', { ascending: false });
+  _listOrderanCache = data || [];
+  renderListOrderan();
+}
+
+function renderListOrderan() {
   var wrap = document.getElementById('listOrderanBody');
-
   var hariIni = new Date(); hariIni.setHours(0,0,0,0);
-  var jumlahBerjalan = 0, jumlahTempo = 0;
 
-  if (!data || data.length === 0) {
-    wrap.innerHTML = '<p class="empty-state">Belum ada orderan berjalan.</p>';
-    document.getElementById('pillBerjalan').textContent = 'Berjalan 0';
-    document.getElementById('pillTempo').textContent = 'Jatuh tempo 0';
+  var wilayahFilter = document.getElementById('filterWilayah').value;
+  var statusFilter = document.getElementById('filterStatus').value;
+  var urutanFilter = document.getElementById('filterUrutan').value;
+
+  // hitung status jatuh tempo tiap baris dulu
+  var data = _listOrderanCache.map(function(row) {
+    var jt = hitungJatuhTempo(row.tanggal_masuk, row.hari);
+    var jtTanpaJam = new Date(jt); jtTanpaJam.setHours(0,0,0,0);
+    row._jt = jt;
+    row._jatuhTempo = jtTanpaJam <= hariIni;
+    return row;
+  });
+
+  var jumlahBerjalanTotal = data.filter(function(r) { return !r._jatuhTempo; }).length;
+  var jumlahTempoTotal = data.filter(function(r) { return r._jatuhTempo; }).length;
+  document.getElementById('pillBerjalan').textContent = 'Berjalan ' + jumlahBerjalanTotal;
+  document.getElementById('pillTempo').textContent = 'Jatuh tempo ' + jumlahTempoTotal;
+
+  // terapkan filter
+  if (wilayahFilter !== 'semua') data = data.filter(function(r) { return r.lokasi === wilayahFilter; });
+  if (statusFilter === 'berjalan') data = data.filter(function(r) { return !r._jatuhTempo; });
+  if (statusFilter === 'tempo') data = data.filter(function(r) { return r._jatuhTempo; });
+
+  // terapkan urutan
+  data.sort(function(a, b) {
+    var ta = new Date(a.created_at).getTime();
+    var tb = new Date(b.created_at).getTime();
+    return urutanFilter === 'terlama' ? ta - tb : tb - ta;
+  });
+
+  if (data.length === 0) {
+    wrap.innerHTML = '<p class="empty-state">Tidak ada orderan yang cocok dengan filter ini.</p>';
     return;
   }
 
   wrap.innerHTML = '';
   data.forEach(function(row) {
-    var jt = hitungJatuhTempo(row.tanggal_masuk, row.hari);
-    var jtTanpaJam = new Date(jt); jtTanpaJam.setHours(0,0,0,0);
-    var sudahJatuhTempo = jtTanpaJam <= hariIni;
-    if (sudahJatuhTempo) jumlahTempo++; else jumlahBerjalan++;
-
     var aj = labelAntarJemput(row.layanan);
     var tarif = hitungTarif(row.ukuran, row.hari);
+    var kodeWilayah = prefixLokasi[row.lokasi] || (row.lokasi || '-');
     var div = document.createElement('div');
     div.className = 'list-row';
     div.innerHTML =
       '<div><p class="list-cell-name">' + row.nama + ' <span class="list-kode">· ' + row.kode + '</span></p><p class="list-cell-nik">' + row.wa + ' · NIK ...' + row.identitas + '</p></div>' +
+      '<span class="badge-mini badge-neutral">' + kodeWilayah + '</span>' +
       '<span>' + row.deskripsi + '</span>' +
       '<span>' + row.ukuran.split('-')[0] + ' · ' + row.hari + ' hari</span>' +
       '<span class="badge-mini ' + aj.kelas + '">' + aj.teks + '</span>' +
       '<span style="font-weight:bold">Rp ' + tarif.toLocaleString('id-ID') + '</span>' +
-      (sudahJatuhTempo
-        ? '<span class="jatuh-tempo-warn"><span class="warn-icon">⚠️</span>' + formatTanggalID(jt) + '</span>'
-        : '<span>' + formatTanggalID(jt) + '</span>') +
-      (sudahJatuhTempo
+      (row._jatuhTempo
+        ? '<span class="jatuh-tempo-warn"><span class="warn-icon">⚠️</span>' + formatTanggalID(row._jt) + '</span>'
+        : '<span>' + formatTanggalID(row._jt) + '</span>') +
+      (row._jatuhTempo
         ? '<span class="badge-mini badge-danger">Jatuh tempo</span>'
         : '<span class="badge-mini badge-tosca">Berjalan</span>');
     wrap.appendChild(div);
   });
-
-  document.getElementById('pillBerjalan').textContent = 'Berjalan ' + jumlahBerjalan;
-  document.getElementById('pillTempo').textContent = 'Jatuh tempo ' + jumlahTempo;
 }
 
 /* =============================================
@@ -347,25 +379,52 @@ async function cariDanTampilkanLabel() {
   document.getElementById('labelMasuk').textContent = new Date(data.tanggal_masuk).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
   area.style.display = 'flex';
+  terapkanUkuranLabel();
 
   try {
-    JsBarcode('#labelBarcode', data.kode, { format: 'CODE128', width: 2, height: 50, displayValue: false, margin: 0 });
+    QRCode.toCanvas(document.getElementById('labelQR'), data.kode, { width: 90, margin: 0 }, function(err) {
+      if (err) {
+        console.error('Gagal membuat QR:', err);
+        msg.textContent = 'Label tampil, tapi QR gagal dibuat (cek koneksi internet).';
+      }
+    });
   } catch (err) {
-    console.error('Gagal membuat barcode:', err);
-    msg.textContent = 'Label tampil, tapi barcode gagal dibuat (cek koneksi internet).';
+    console.error('Gagal membuat QR:', err);
+    msg.textContent = 'Label tampil, tapi QR gagal dibuat (cek koneksi internet).';
   }
 }
 
-document.getElementById('btnPrintLabel').addEventListener('click', function() {
+/* =============================================
+   UKURAN LABEL — scale otomatis biar selalu pas 1 halaman
+   ============================================= */
+document.getElementById('labelUkuranKertas').addEventListener('change', terapkanUkuranLabel);
+
+function terapkanUkuranLabel() {
   var ukuran = document.getElementById('labelUkuranKertas').value; // contoh: "50x30"
   var parts = ukuran.split('x');
+  var targetW = parseFloat(parts[0]);
+  var targetH = parseFloat(parts[1]);
+  var baseW = 100, baseH = 50; // ukuran desain dasar (mm), jangan diubah
+
+  var target = document.getElementById('labelPrintTarget');
+  var card = document.getElementById('labelCard');
+  var factor = Math.min(targetW / baseW, targetH / baseH);
+
+  target.style.width = targetW + 'mm';
+  target.style.height = targetH + 'mm';
+  card.style.transform = 'scale(' + factor + ')';
+
   var styleTag = document.getElementById('printPageSizeStyle');
   if (!styleTag) {
     styleTag = document.createElement('style');
     styleTag.id = 'printPageSizeStyle';
     document.head.appendChild(styleTag);
   }
-  styleTag.textContent = '@page { size: ' + parts[0] + 'mm ' + parts[1] + 'mm; margin: 0; } .label-card { width: ' + parts[0] + 'mm !important; }';
+  styleTag.textContent = '@page { size: ' + targetW + 'mm ' + targetH + 'mm; margin: 0; }';
+}
+
+document.getElementById('btnPrintLabel').addEventListener('click', function() {
+  terapkanUkuranLabel();
   window.print();
 });
 
