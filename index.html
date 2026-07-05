@@ -26,6 +26,10 @@
   <meta name="twitter:image" content="https://lh3.googleusercontent.com/d/12d704beJlh-f1EYF2nd2JXntwuKlo5jJ">
 
   <link rel="canonical" href="https://nitipbox.my.id">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/12d704beJlh-f1EYF2nd2JXntwuKlo5jJ">
+  <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/12d704beJlh-f1EYF2nd2JXntwuKlo5jJ">
+  <meta name="theme-color" content="#005a4e">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -206,6 +210,22 @@
     <p class="foto-caption">Ilustrasi sistem penyimpanan NitipBox</p>
   </div>
 
+  <div class="testimoni-section">
+    <h3>⭐ Kata Pelanggan Kami</h3>
+    <div class="testimoni-grid">
+      <div class="testimoni-card">
+        <div class="testimoni-bintang">★★★★★</div>
+        <p>"Pelayanannya baik, amanah, good."</p>
+        <span>— Nur Afidah</span>
+      </div>
+      <div class="testimoni-card">
+        <div class="testimoni-bintang">★★★★★</div>
+        <p>"Amanah dan sangat membantu buat yang transit di Surabaya/Sidoarjo, dekat dengan bandara Juanda. Tarif juga sangat murah."</p>
+        <span>— Muhammad Yusril M.</span>
+      </div>
+    </div>
+  </div>
+
   <div class="leads-section">
     <div class="leads-inner">
       <div class="leads-title">Belum siap titip sekarang?</div>
@@ -367,5 +387,12 @@
   </div>
 
   <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/service-worker.js');
+      });
+    }
+  </script>
 </body>
 </html>
