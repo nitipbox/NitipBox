@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NitipBox Admin</title>
+<link rel="manifest" href="manifest-admin.json">
+<link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/12d704beJlh-f1EYF2nd2JXntwuKlo5jJ">
+<link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/12d704beJlh-f1EYF2nd2JXntwuKlo5jJ">
+<meta name="theme-color" content="#005a4e">
 <link rel="stylesheet" href="admin.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
@@ -557,5 +561,12 @@
   </div>
 
   <script src="admin.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/service-worker.js');
+      });
+    }
+  </script>
 </body>
 </html>
