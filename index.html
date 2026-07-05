@@ -1,566 +1,392 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>NitipBox Admin</title>
-<link rel="manifest" href="manifest-admin.json">
-<link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/12d704beJlh-f1EYF2nd2JXntwuKlo5jJ">
-<link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/12d704beJlh-f1EYF2nd2JXntwuKlo5jJ">
-<meta name="theme-color" content="#005a4e">
-<link rel="stylesheet" href="admin.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NitipBox — Jasa Titip Barang Surabaya & Sidoarjo | Mulai Rp 3.000/hari</title>
+
+  <meta name="description" content="NitipBox — jasa simpan & titip barang harian di Surabaya dan Sidoarjo. Mulai Rp 3.000/hari. Aman, terdokumentasi foto, kode unik per barang. Buka Senin–Minggu 08.00–21.00.">
+  <meta name="keywords" content="jasa titip barang Surabaya, jasa simpan barang Sidoarjo, storage harian Surabaya, titip barang murah, NitipBox">
+  <meta name="author" content="NitipBox">
+  <meta name="robots" content="index, follow">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://nitipbox.my.id">
+  <meta property="og:title" content="NitipBox — Titip Aman, Hati Tenang">
+  <meta property="og:description" content="Jasa simpan & titip barang harian di Surabaya & Sidoarjo. Mulai Rp 3.000/hari. Aman, terdokumentasi, ada kode unik per barang. Buka setiap hari 08.00–21.00.">
+  <meta property="og:image" content="https://lh3.googleusercontent.com/d/12d704beJlh-f1EYF2nd2JXntwuKlo5jJ">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:site_name" content="NitipBox">
+  <meta property="og:locale" content="id_ID">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="NitipBox — Titip Aman, Hati Tenang">
+  <meta name="twitter:description" content="Jasa simpan & titip barang harian di Surabaya & Sidoarjo. Mulai Rp 3.000/hari.">
+  <meta name="twitter:image" content="https://lh3.googleusercontent.com/d/12d704beJlh-f1EYF2nd2JXntwuKlo5jJ">
+
+  <link rel="canonical" href="https://nitipbox.my.id">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/12d704beJlh-f1EYF2nd2JXntwuKlo5jJ">
+  <link rel="apple-touch-icon" href="https://lh3.googleusercontent.com/d/12d704beJlh-f1EYF2nd2JXntwuKlo5jJ">
+  <meta name="theme-color" content="#005a4e">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-  <!-- TOP BAR MOBILE -->
-  <div id="mobileTopbar" class="mobile-topbar">
-    <div>
-      <p class="mobile-topbar-eyebrow">NitipBox admin</p>
-      <h2 id="mobileTopbarTitle" class="mobile-topbar-title">Verifikasi orderan</h2>
-    </div>
-    <button id="btnLogoutMobile" class="mobile-topbar-avatar" aria-label="Keluar / profil">
-      <i class="ti ti-user" aria-hidden="true"></i>
-    </button>
-  </div>
-
-  <!-- LOGIN SCREEN -->
-  <div id="loginScreen" class="login-screen">
-    <div class="login-card">
-      <div class="login-logo">NitipBox</div>
-      <p class="login-sub">Panel admin</p>
-      <button id="btnLoginGoogle" class="btn-google">
-        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 01-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.81.54-1.85.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.94v2.33A9 9 0 009 18z"/><path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 010-3.44V4.95H.94a9 9 0 000 8.1l3.03-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.9 11.42 0 9 0A9 9 0 00.94 4.95L3.97 7.28C4.68 5.16 6.66 3.58 9 3.58z"/></svg>
-        Masuk dengan Google
-      </button>
-      <p id="loginMsg" class="login-msg"></p>
+  <div class="promo-banner" id="promoBanner">
+    <div class="promo-inner">
+      <div class="promo-text">
+        <div class="promo-title">🎉 PROMO SOFT LAUNCH — 10 Pelanggan Pertama!</div>
+        <div class="promo-sub">Titip pertama dapat diskon 20% • Berlaku sampai 7 Juli 2026</div>
+      </div>
+      <div class="promo-right">
+        <div class="countdown">
+          <div class="cd-box"><div class="cd-num" id="cdHari">00</div><div class="cd-lbl">Hari</div></div>
+          <div class="cd-sep">:</div>
+          <div class="cd-box"><div class="cd-num" id="cdJam">00</div><div class="cd-lbl">Jam</div></div>
+          <div class="cd-sep">:</div>
+          <div class="cd-box"><div class="cd-num" id="cdMenit">00</div><div class="cd-lbl">Menit</div></div>
+          <div class="cd-sep">:</div>
+          <div class="cd-box"><div class="cd-num" id="cdDetik">00</div><div class="cd-lbl">Detik</div></div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- APP SHELL -->
-  <div id="appShell" class="app-shell" style="display:none">
-    <div class="sidebar">
-      <p class="sidebar-brand">NitipBox admin</p>
-      <button class="nav-item active" data-tab="verifikasi">
-        <i class="ti ti-hourglass nav-icon" aria-hidden="true"></i>
-        <span>Verifikasi orderan</span>
-        <span id="badgeVerifikasi" class="nav-badge" style="display:none">0</span>
-      </button>
-      <button class="nav-item" data-tab="listorderan">
-        <i class="ti ti-clipboard-list nav-icon" aria-hidden="true"></i>
-        <span>List orderan</span>
-      </button>
-      <button class="nav-item" data-tab="label">
-        <i class="ti ti-tag nav-icon" aria-hidden="true"></i>
-        <span>Cetak label</span>
-      </button>
-      <button class="nav-item" data-tab="analisis">
-        <i class="ti ti-chart-bar nav-icon" aria-hidden="true"></i>
-        <span>Analisis orderan</span>
-      </button>
-      <button class="nav-item" data-tab="keuangan">
-        <i class="ti ti-wallet nav-icon" aria-hidden="true"></i>
-        <span>Keuangan</span>
-      </button>
-      <button class="nav-item" data-tab="galeri">
-        <i class="ti ti-photo nav-icon" aria-hidden="true"></i>
-        <span>Galeri</span>
-      </button>
-      <div class="sidebar-footer">
-        <div class="sidebar-avatar"><i class="ti ti-user" aria-hidden="true"></i></div>
-        <span id="adminEmail" class="sidebar-email"></span>
-        <button id="btnLogout" class="btn-logout" aria-label="Keluar"><i class="ti ti-logout" aria-hidden="true"></i></button>
+  <div class="navbar">
+    <img src="https://lh3.googleusercontent.com/d/12d704beJlh-f1EYF2nd2JXntwuKlo5jJ" alt="Logo NitipBox" style="height: 105px; width: auto; object-fit: contain; display: block; margin: 0 auto;">
+  </div>
+
+  <div class="hero-container">
+    <div class="hero-left">
+      <h2>TITIP AMAN,<br><span>HATI TENANG</span> BERSAMA KAMI!</h2>
+      <p>NitipBox menyediakan ruang penyimpanan barang premium, fleksibel, dan terpantau penuh. Solusi terbaik untuk kebutuhan ruang ekstra barang-barang berhargamu tanpa rasa cemas.</p>
+      <div class="hero-stats">
+        <div class="stat-item"><div class="stat-val">100%</div><div class="stat-lbl">Jaminan Keamanan</div></div>
+        <div class="stat-item"><div class="stat-val">24/7</div><div class="stat-lbl">Pengawasan CCTV</div></div>
+        <div class="stat-item"><div class="stat-val">0%</div><div class="stat-lbl">Khawatir Ruang Sempit</div></div>
       </div>
     </div>
 
-    <div class="main">
+    <div class="hero-right">
+      <div class="tab-container">
+        <button class="tab-btn active" onclick="switchTab('order')">📋 ORDER</button>
+        <button class="tab-btn" onclick="switchTab('tempo')">🔍 JATUH TEMPO</button>
+        <button class="tab-btn" onclick="switchTab('tarif')">💰 ESTIMASI BIAYA</button>
+      </div>
+      <div class="main-box">
 
-      <!-- TAB: VERIFIKASI ORDERAN -->
-      <section id="tab-verifikasi" class="tab-panel active">
-        <div class="panel-head">
-          <h2>Verifikasi orderan masuk</h2>
-          <span id="verifikasiCount" class="panel-sub">Memuat...</span>
-        </div>
+        <div id="section-order" class="content-section active">
+          <div id="formWrapper">
+            <form id="formJasa" onsubmit="submitFormOrder(this)">
+              <div class="field">
+                <label>Pilih Point / Lokasi NitipBox</label>
+                <select name="lokasi" id="selectLokasi" required>
+                  <option value="">-- Pilih lokasi terdekat --</option>
+                </select>
+                <div class="lokasi-note">
+                  <span style="flex-shrink:0;">ℹ️</span>
+                  <span>Pilihan lokasi ini sebagai preferensi. Admin akan konfirmasi ketersediaan via WhatsApp setelah booking diterima.</span>
+                </div>
+              </div>
 
-        <div class="stat-grid">
-          <div class="stat-card stat-tosca">
-            <span class="stat-label">Order aktif</span>
-            <span id="statAktif" class="stat-value">–</span>
-          </div>
-          <div class="stat-card stat-alert">
-            <span class="stat-label">Jatuh tempo hari ini</span>
-            <span id="statTempo" class="stat-value">–</span>
-          </div>
-          <div class="stat-card stat-tosca">
-            <span class="stat-label">Pemasukan bulan ini</span>
-            <span id="statPemasukan" class="stat-value">–</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Belum diverifikasi</span>
-            <span id="statBelum" class="stat-value">–</span>
-          </div>
-        </div>
+              <div class="field"><label>Tanggal Rencana Masuk</label><input type="date" name="tanggal" required></div>
+              <div class="field"><label>Nama Lengkap Anda</label><input type="text" name="nama" placeholder="Ketik nama sesuai KTP" required></div>
+              <div class="field"><label>Nomor WhatsApp (Aktif)</label><input type="text" name="wa" placeholder="Contoh: 081234567xxx" required></div>
+              <div class="field"><label>Barang Yang Mau Dititipkan?</label><input type="text" name="deskripsi" placeholder="Koper Besar / Sepatu" required></div>
+              <div class="field">
+                <label>Ukuran Barang</label>
+                <select name="ukuran" required>
+                  <option value="Kecil-S">Kecil - S (Rp 3.000/hari)</option>
+                  <option value="Sedang-M">Sedang - M (Rp 7.000/hari)</option>
+                  <option value="Besar-L">Besar - L (Rp 12.000/hari)</option>
+                  <option value="Sangat Besar-XL">Sangat Besar - XL (Rp 20.000/hari)</option>
+                  <option value="Super Besar-XXL+">Super Besar - XXL+ (Rp 50.000/hari)</option>
+                </select>
+              </div>
+              <div class="field"><label>Mau Disimpan Berapa Hari?</label><input type="number" name="hari" value="1" min="1" required></div>
+              <div class="field">
+                <label>Layanan Antar / Jemput?</label>
+                <select name="layanan" required>
+                  <option value="Tidak, Terimakasih">Tidak, Terimakasih</option>
+                  <option value="Penjemputan (+3.000/km)">Penjemputan (+3.000/km dari Lokasi)</option>
+                  <option value="Pengantaran (+3.000/km)">Pengantaran (+3.000/km dari Lokasi)</option>
+                  <option value="+ Keduanya (+5.000/km)">+ Keduanya (+5.000/km dari Lokasi)</option>
+                </select>
+              </div>
+              <div class="field"><label>No. Identitas (6 Angka Terakhir)</label><input type="text" name="identitas" pattern="[0-9]{6}" maxlength="6" placeholder="Contoh: 123456" required></div>
 
-        <div id="verifikasiList" class="order-list">
-          <p class="empty-state">Memuat data orderan...</p>
-        </div>
-      </section>
+              <div>
+                <span class="ref-toggle" onclick="toggleRef(this)">🎟️ Punya kode referral? Klik di sini</span>
+                <div class="ref-field" id="refField">
+                  <label>Kode Referral (Opsional)</label>
+                  <input type="text" id="inputReferral" placeholder="Contoh: REF-BUDI01" style="text-transform:uppercase">
+                  <div style="font-size:11px;color:#888;margin-top:4px">Kode referral dari teman yang mengajakmu. Akan dikirim ke admin via WA.</div>
+                </div>
+              </div>
 
-      <!-- TAB: LIST ORDERAN -->
-      <section id="tab-listorderan" class="tab-panel">
-        <div class="panel-head">
-          <h2>List orderan</h2>
-          <div class="panel-pills">
-            <span id="pillBerjalan" class="pill pill-tosca">Berjalan –</span>
-            <span id="pillTempo" class="pill pill-danger">Jatuh tempo –</span>
-            <span id="pillDiambil" class="pill pill-neutral">Sudah diambil –</span>
-          </div>
-        </div>
+              <div class="sk-wrap">
+                <div class="sk-check-row">
+                  <input type="checkbox" id="checkSK" required>
+                  <label for="checkSK" class="sk-check-label">
+                    Saya telah membaca dan menyetujui <a onclick="bukaSK()">Syarat & Ketentuan NitipBox</a>. Saya memahami bahwa booking ini tunduk pada ketentuan yang berlaku.
+                  </label>
+                </div>
+              </div>
 
-        <div class="filter-bar">
-          <input type="text" id="searchListOrderan" placeholder="🔍 Cari nama, kode, atau barang..." class="search-input">
-          <select id="filterWilayah">
-            <option value="semua">Semua wilayah</option>
-            <option value="Surabaya">Surabaya (SBY)</option>
-            <option value="Sidoarjo">Sidoarjo (SDA01)</option>
-            <option value="Sidoarjo 2 (Back Up)">Sidoarjo 2 (SDA02)</option>
-          </select>
-          <select id="filterStatus">
-            <option value="semua">Semua status</option>
-            <option value="berjalan">Order berjalan</option>
-            <option value="tempo">Order jatuh tempo</option>
-            <option value="diambil">Sudah diambil</option>
-          </select>
-          <select id="filterUrutan">
-            <option value="terbaru">Order terbaru</option>
-            <option value="terlama">Order terlama</option>
-          </select>
-          <button id="btnScanCheckout" class="btn btn-tosca-solid">📷 Scan untuk Checkout</button>
-        </div>
+              <button type="submit" id="btnOrder" class="btn-tosca">🟢 KIRIM FORM ORDERAN</button>
+            </form>
+          </div>
 
-        <div class="list-table">
-          <div class="list-row list-head">
-            <span>Pelanggan</span>
-            <span>Wilayah</span>
-            <span>Barang</span>
-            <span>Tipe order</span>
-            <span>Antar/jemput</span>
-            <span>Tarif</span>
-            <span>Jatuh tempo</span>
-            <span>Status</span>
-            <span>Aksi</span>
-          </div>
-          <div id="listOrderanBody">
-            <p class="empty-state">Memuat data orderan...</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- TAB: CETAK LABEL -->
-      <section id="tab-label" class="tab-panel">
-        <div class="panel-head">
-          <h2>Cetak label</h2>
-        </div>
-
-        <div class="label-search">
-          <label for="labelKodeInput">Cari kode booking</label>
-          <div class="label-search-row">
-            <input type="text" id="labelKodeInput" placeholder="Contoh: NTB-SBY-0001">
-            <button id="btnCariLabel" class="btn-tosca-solid">Cari</button>
-          </div>
-          <p id="labelSearchMsg" class="label-search-msg"></p>
-        </div>
-      </section>
-
-
-      <!-- TAB: KEUANGAN -->
-      <section id="tab-keuangan" class="tab-panel">
-        <div class="panel-head">
-          <h2>Keuangan</h2>
-          <div style="display:flex;gap:8px">
-            <button id="btnTambahPemasukan" class="btn btn-ghost">＋ Tambah pemasukan</button>
-            <button id="btnTambahPengeluaran" class="btn btn-ghost">＋ Tambah pengeluaran</button>
-            <button id="btnExportPdf" class="btn btn-tosca-solid">⬇ Export PDF</button>
-          </div>
-        </div>
-
-        <div class="filter-bar">
-          <select id="filterCabangKeuangan">
-            <option value="semua">Semua cabang</option>
-            <option value="Surabaya">Surabaya</option>
-            <option value="Sidoarjo">Sidoarjo</option>
-            <option value="Sidoarjo 2 (Back Up)">Sidoarjo 2</option>
-          </select>
-        </div>
-
-        <div class="stat-grid">
-          <div class="stat-card stat-tosca">
-            <span class="stat-label">Pemasukan bulan ini</span>
-            <span id="kPemasukanBulan" class="stat-value">–</span>
-          </div>
-          <div class="stat-card stat-alert">
-            <span class="stat-label">Pengeluaran bulan ini</span>
-            <span id="kPengeluaranBulan" class="stat-value">–</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Laba bersih bulan ini</span>
-            <span id="kLabaBulan" class="stat-value">–</span>
-          </div>
-          <div class="stat-card" style="background:var(--tosca-dark)">
-            <span id="kSaldoLabel" class="stat-label" style="color:#9FE1CB">Saldo kas saat ini</span>
-            <span id="kSaldoKas" class="stat-value" style="color:#fff">–</span>
-          </div>
-        </div>
-
-        <p class="panel-subtitle">Ringkasan laba & pajak</p>
-        <div class="pajak-table">
-          <div class="pajak-row pajak-head">
-            <span></span><span>Bulan ini</span><span>Tahun berjalan</span>
-          </div>
-          <div class="pajak-row">
-            <span>Omzet (pendapatan kotor)</span><span id="pOmzetBulan">–</span><span id="pOmzetTahun">–</span>
-          </div>
-          <div class="pajak-row">
-            <span>Total beban operasional</span><span id="pBebanBulan">–</span><span id="pBebanTahun">–</span>
-          </div>
-          <div class="pajak-row pajak-highlight">
-            <span>Laba bersih</span><span id="pLabaBulan">–</span><span id="pLabaTahun">–</span>
-          </div>
-          <div class="pajak-row pajak-dashed">
-            <span>Estimasi PPh Final (0,5% × omzet)</span><span id="pPphBulan">–</span><span id="pPphTahun">–</span>
-          </div>
-        </div>
-        <p class="pajak-disclaimer">*Estimasi umum berdasarkan PP 20/2026 untuk omzet di bawah Rp4,8 miliar/tahun. Bukan pengganti konsultasi resmi ke akuntan/konsultan pajak.</p>
-
-        <p class="panel-subtitle">Tren 7 hari terakhir</p>
-        <div class="chart-box">
-          <svg id="trenChart" viewBox="0 0 560 120" style="width:100%;height:110px"></svg>
-          <div class="chart-legend"><span class="legend-tosca">▬ Pemasukan</span><span class="legend-danger">┄ Pengeluaran</span></div>
-        </div>
-
-        <p class="panel-subtitle">Riwayat transaksi</p>
-        <div class="list-table">
-          <div class="list-row keuangan-row keuangan-head">
-            <span>Tanggal</span><span>Keterangan</span><span>Kategori</span><span>Masuk</span><span>Keluar</span><span>Saldo</span><span>Bukti</span>
-          </div>
-          <div id="riwayatTransaksiBody">
-            <p class="empty-state">Memuat riwayat transaksi...</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- TAB: ANALISIS ORDERAN -->
-      <section id="tab-analisis" class="tab-panel">
-        <div class="panel-head">
-          <h2>Analisis orderan</h2>
-        </div>
-
-        <div class="stat-grid">
-          <div class="stat-card stat-tosca">
-            <span class="stat-label">Total order (semua waktu)</span>
-            <span id="aTotalOrder" class="stat-value">–</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Rata-rata durasi simpan</span>
-            <span id="aRataDurasi" class="stat-value">–</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">% pakai antar/jemput</span>
-            <span id="aPersenAntarJemput" class="stat-value">–</span>
-          </div>
-          <div class="stat-card stat-alert">
-            <span class="stat-label">Order ditolak</span>
-            <span id="aDitolak" class="stat-value">–</span>
-          </div>
-        </div>
-
-        <p class="panel-subtitle">Order per wilayah</p>
-        <div id="analisisWilayah" class="breakdown-box"></div>
-
-        <p class="panel-subtitle">Order per ukuran barang</p>
-        <div id="analisisUkuran" class="breakdown-box"></div>
-
-        <p class="panel-subtitle">Tren order masuk — 14 hari terakhir</p>
-        <div class="chart-box">
-          <svg id="trenOrderChart" viewBox="0 0 560 120" style="width:100%;height:110px"></svg>
-        </div>
-      </section>
-
-      <!-- TAB: GALERI -->
-      <section id="tab-galeri" class="tab-panel">
-        <div class="panel-head">
-          <h2>Galeri dokumentasi</h2>
-        </div>
-
-        <div class="label-search">
-          <label for="galeriKodeInput">Cari kode booking</label>
-          <div class="label-search-row">
-            <input type="text" id="galeriKodeInput" placeholder="Contoh: NTB-SBY-0001">
-            <button id="btnCariGaleri" class="btn-tosca-solid">Cari</button>
-          </div>
-          <p id="galeriSearchMsg" class="label-search-msg"></p>
-        </div>
-
-        <div id="galeriArea" style="display:none">
-          <div class="panel-head" style="margin-top:10px">
-            <div class="galeri-tabs">
-              <button class="galeri-tab-btn active" data-tipe="checkin">Checkin</button>
-              <button class="galeri-tab-btn" data-tipe="checkout">Checkout</button>
+          <div id="suksesCard" class="sukses-card">
+            <div class="sukses-header">
+              <span class="sukses-icon">✅</span>
+              <p class="sukses-title">BOOKING BERHASIL!</p>
             </div>
-            <button id="btnHapusSemuaFoto" class="btn btn-icon" title="Hapus semua foto kode ini">🗑️ Hapus semua foto</button>
+            <div class="sukses-body">
+              <div class="kode-booking-box">
+                <div class="kode-booking-label">KODE BOOKING ANDA</div>
+                <div class="kode-booking-val" id="kodeDisplay">NTB-0000</div>
+              </div>
+              <div class="steps-list">
+                <div class="step-row"><div class="step-circle">1</div><div>Simpan kode booking ini — kamu butuhkan saat ambil barang</div></div>
+                <div class="step-row"><div class="step-circle">2</div><div>Admin akan konfirmasi via WA dalam waktu singkat</div></div>
+                <div class="step-row"><div class="step-circle">3</div><div>Antarkan barang sesuai jadwal yang disepakati dengan admin</div></div>
+              </div>
+              <button class="btn-wa-kirim" onclick="kirimKeWA()">💬 Kirim Kode Booking ke Admin WA</button>
+              <button class="btn-order-lagi" onclick="orderLagi()">🔄 Buat Booking Baru</button>
+            </div>
           </div>
-          <div id="galeriCheckoutBanner" class="galeri-checkout-banner" style="display:none">⚠️ Upload minimal 1 foto checkout sebelum bisa konfirmasi selesai</div>
-          <div id="galeriGrid" class="galeri-grid"></div>
-          <p class="pajak-disclaimer">Foto otomatis dikompres saat diunggah untuk hemat penyimpanan.</p>
-          <button id="btnKonfirmasiCheckout" class="btn btn-tosca-solid" style="display:none;width:100%;margin-top:12px" disabled>✅ Konfirmasi Checkout Selesai</button>
         </div>
-      </section>
 
-    </div>
-  </div>
+        <div id="section-tempo" class="content-section">
+          <div class="field"><label>Masukkan Kode Booking Anda</label><input type="text" id="tempoKode" placeholder="Contoh: NTB-0001"></div>
+          <button onclick="prosesCekTempo()" id="btnTempo" class="btn-tosca">🔍 TRACK STATUS</button>
+          <div id="resTempo" class="result-box"></div>
+        </div>
 
-  <!-- MODAL TAMBAH PENGELUARAN -->
-  <div id="pengeluaranModalOverlay" class="edit-modal-overlay">
-    <div class="edit-modal">
-      <div class="edit-modal-head">
-        <span>Tambah pengeluaran</span>
-        <button id="btnTutupPengeluaran" class="edit-modal-close" aria-label="Tutup">✕</button>
-      </div>
-      <form id="formPengeluaran" class="edit-modal-body">
-        <div class="edit-field">
-          <label>Tanggal</label>
-          <input type="date" id="pengeluaranTanggal" required>
-        </div>
-        <div class="edit-field">
-          <label>Keterangan</label>
-          <input type="text" id="pengeluaranKeterangan" placeholder="Contoh: Beli plastik & label" required>
-        </div>
-        <div class="edit-field">
-          <label>Cabang / Point</label>
-          <select id="pengeluaranLokasi">
-            <option value="">Umum (semua cabang)</option>
-            <option value="Surabaya">Surabaya</option>
-            <option value="Sidoarjo">Sidoarjo</option>
-            <option value="Sidoarjo 2 (Back Up)">Sidoarjo 2</option>
-          </select>
-        </div>
-        <div class="edit-field">
-          <label>Kategori</label>
-          <select id="pengeluaranKategori" required>
-            <option value="__baru__">＋ Tambah kategori baru...</option>
-          </select>
-        </div>
-        <div class="edit-field" id="wrapKategoriBaru" style="display:none">
-          <label>Nama kategori baru</label>
-          <input type="text" id="pengeluaranKategoriBaru" placeholder="Contoh: Transport">
-        </div>
-        <div class="edit-field">
-          <label>Jumlah (Rp)</label>
-          <input type="number" id="pengeluaranJumlah" min="0" required>
-        </div>
-        <div class="edit-field">
-          <label>Foto bukti nota / transfer (wajib)</label>
-          <input type="file" id="pengeluaranBukti" accept="image/*" required>
-          <img id="pengeluaranBuktiPreview" style="display:none;max-width:100%;border-radius:8px;margin-top:8px">
-        </div>
-        <div class="edit-modal-actions">
-          <button type="button" id="btnBatalPengeluaran" class="btn btn-ghost">Batal</button>
-          <button type="submit" id="btnSimpanPengeluaran" class="btn btn-tosca-solid">Simpan pengeluaran</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- REALTIME NOTIF TOAST -->
-  <div id="notifToast" class="notif-toast"></div>
-
-  <!-- MODAL EDIT ORDERAN -->
-  <div id="editModalOverlay" class="edit-modal-overlay">
-    <div class="edit-modal">
-      <div class="edit-modal-head">
-        <span>Sunting data orderan</span>
-        <button id="btnTutupEdit" class="edit-modal-close" aria-label="Tutup">✕</button>
-      </div>
-      <form id="formEdit" class="edit-modal-body">
-        <input type="hidden" id="editId">
-        <div class="edit-field">
-          <label>Nama lengkap</label>
-          <input type="text" id="editNama" required>
-        </div>
-        <div class="edit-field">
-          <label>Nomor WhatsApp</label>
-          <input type="text" id="editWa" required>
-        </div>
-        <div class="edit-field">
-          <label>Barang yang dititipkan</label>
-          <input type="text" id="editDeskripsi" required>
-        </div>
-        <div class="edit-field-row">
-          <div class="edit-field">
-            <label>Ukuran</label>
-            <select id="editUkuran">
-              <option value="Kecil-S">Kecil - S</option>
-              <option value="Sedang-M">Sedang - M</option>
-              <option value="Besar-L">Besar - L</option>
-              <option value="Sangat Besar-XL">Sangat Besar - XL</option>
-              <option value="Super Besar-XXL+">Super Besar - XXL+</option>
+        <div id="section-tarif" class="content-section">
+          <div class="field">
+            <label>Pilih Ukuran Jasa Layanan</label>
+            <select id="tarifUkuran" onchange="hitungKalkulatorTarif()">
+              <option value="Kecil-S">Kecil - S (Rp 3.000/hari)</option>
+              <option value="Sedang-M">Sedang - M (Rp 7.000/hari)</option>
+              <option value="Besar-L">Besar - L (Rp 12.000/hari)</option>
+              <option value="Sangat Besar-XL">Sangat Besar - XL (Rp 20.000/hari)</option>
+              <option value="Super Besar-XXL+">Super Besar - XXL+ (Rp 50.000/hari)</option>
             </select>
           </div>
-          <div class="edit-field">
-            <label>Jumlah hari</label>
-            <input type="number" id="editHari" min="1" required>
+          <div class="field"><label>Masukkan Jumlah Hari Penyimpanan</label><input type="number" id="tarifHari" value="1" min="1" oninput="hitungKalkulatorTarif()"></div>
+          <div class="calc-box">
+            <div style="font-weight:bold;margin-bottom:12px;text-align:center;color:#f57f17;">🧮 RINCIAN ESTIMASI BIAYA</div>
+            <div class="calc-row"><span>Tarif Dasar:</span><span id="outTarifDasar">Rp 3.000/hari</span></div>
+            <div class="calc-row"><span>Durasi:</span><span id="outHari">1 Hari</span></div>
+            <div class="calc-row"><span>Harga Kotor:</span><span id="outKotor">Rp 3.000</span></div>
+            <div class="calc-row" style="color:#c62828;font-weight:bold;"><span>Diskon Promo:</span><span id="outDiskon">Rp 0 (0%)</span></div>
+            <div class="calc-divider"></div>
+            <div class="calc-row" style="font-weight:bold;color:var(--tosca-theme);font-size:15px;"><span>Total Bayar:</span><span id="outTotal">Rp 3.000</span></div>
+            <div class="calc-row" style="font-weight:bold;color:#2e7d32;"><span>Minimal DP (30%):</span><span id="outDp">Rp 1.000</span></div>
           </div>
         </div>
-        <div class="edit-field">
-          <label>Layanan antar/jemput</label>
-          <select id="editLayanan">
-            <option value="Tidak, Terimakasih">Tidak, Terimakasih</option>
-            <option value="Penjemputan (+3.000/km)">Penjemputan</option>
-            <option value="Pengantaran (+3.000/km)">Pengantaran</option>
-            <option value="+ Keduanya (+5.000/km)">Antar + Jemput</option>
-          </select>
-        </div>
-        <div class="edit-field">
-          <label>No. identitas (6 angka terakhir)</label>
-          <input type="text" id="editIdentitas" pattern="[0-9]{6}" maxlength="6" required>
-        </div>
-        <div class="edit-modal-actions">
-          <button type="button" id="btnBatalEdit" class="btn btn-ghost">Batal</button>
-          <button type="submit" class="btn btn-tosca-solid">Simpan perubahan</button>
-        </div>
-      </form>
-    </div>
-  </div>
 
-  <!-- MODAL NOTA -->
-  <div id="notaModalOverlay" class="edit-modal-overlay">
-    <div class="edit-modal">
-      <div class="edit-modal-head">
-        <span>Nota booking</span>
-        <button id="btnTutupNota" class="edit-modal-close" aria-label="Tutup">✕</button>
-      </div>
-      <div id="notaPrintTarget" style="width:260px;margin:16px auto;border:2px dashed #00b89c;border-radius:10px;overflow:hidden;background:#fff;font-family:'Segoe UI',Arial,sans-serif">
-        <div style="background:#005a4e;padding:10px 14px;text-align:center">
-          <span style="color:#fff;font-weight:bold;font-size:13px">NitipBox</span>
-        </div>
-        <div style="padding:16px;text-align:center">
-          <div id="notaQR" style="width:90px;height:90px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center"></div>
-          <p id="notaKode" style="font-size:17px;font-weight:bold;color:#005a4e;margin:0 0 12px;letter-spacing:1px">NTB-0000</p>
-          <div style="text-align:left;font-size:12.5px;color:#555;border-top:1px dashed #ddd;padding-top:10px;line-height:1.9">
-            <div style="display:flex;justify-content:space-between"><span>Nama</span><span id="notaNama" style="color:#222;font-weight:bold">–</span></div>
-            <div style="display:flex;justify-content:space-between"><span>Tanggal transaksi</span><span id="notaTanggalTransaksi" style="color:#222">–</span></div>
-            <div style="display:flex;justify-content:space-between"><span>Layanan</span><span id="notaLayanan" style="color:#222">–</span></div>
-            <div style="display:flex;justify-content:space-between"><span>Tanggal masuk</span><span id="notaTanggal" style="color:#222">–</span></div>
-            <div style="display:flex;justify-content:space-between"><span>Jatuh tempo</span><span id="notaJatuhTempo" style="color:#222">–</span></div>
-            <div style="border-top:1px dashed #ddd;margin:4px 0"></div>
-            <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:bold"><span>Total bayar</span><span id="notaTotal" style="color:#005a4e">–</span></div>
-          </div>
-        </div>
-        <p style="text-align:center;font-size:11px;color:#888;padding:0 18px 16px;margin:0">Simpan nota ini untuk pengambilan barang + sebutkan 6 angka terakhir NIK kamu.</p>
-      </div>
-      <div class="edit-modal-actions" style="padding:0 18px 18px">
-        <button type="button" id="btnCetakNota" class="btn btn-tosca-solid">🖨️ Cetak / simpan nota</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL LABEL -->
-  <div id="labelModalOverlay" class="edit-modal-overlay">
-    <div class="edit-modal">
-      <div class="edit-modal-head">
-        <span>Preview label</span>
-        <button id="btnTutupLabel" class="edit-modal-close" aria-label="Tutup">✕</button>
+  <div class="foto-section">
+    <h3>📦 Sistem Penyimpanan NitipBox</h3>
+    <p class="foto-subtitle">Setiap barang tersimpan rapi, berlabel, dan terdokumentasi — aman sampai kamu ambil kembali</p>
+    <div class="foto-grid">
+      <div class="foto-main">
+        <img src="https://lh3.googleusercontent.com/d/1LLJmOB00YaAzwz9es9FDUxawLjprUTvm" alt="Area penyimpanan NitipBox dengan rak berlabel NTB">
       </div>
-      <div id="labelPrintTarget" style="width:220px;margin:16px auto;border:2px dashed #00b89c;border-radius:8px;overflow:hidden;background:#fff;font-family:'Segoe UI',Arial,sans-serif">
-        <div style="background:#005a4e;padding:8px 12px;text-align:center">
-          <span style="color:#fff;font-weight:bold;font-size:13px">NitipBox</span>
-        </div>
-        <div style="padding:12px;text-align:center">
-          <div id="labelQR" style="width:70px;height:70px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center"></div>
-          <p id="labelKode" style="font-size:15px;font-weight:bold;color:#005a4e;margin:0 0 8px;letter-spacing:1px">NTB-0000</p>
-          <div style="text-align:left;font-size:11px;color:#555;border-top:1px dashed #ddd;padding-top:8px;line-height:1.7">
-            <div style="display:flex;justify-content:space-between"><span>Nama</span><span id="labelNama" style="color:#222;font-weight:bold">–</span></div>
-            <div style="display:flex;justify-content:space-between"><span>No. HP</span><span id="labelWa" style="color:#222">–</span></div>
-            <div style="display:flex;justify-content:space-between"><span>Masuk</span><span id="labelMasuk" style="color:#222">–</span></div>
-            <div style="display:flex;justify-content:space-between"><span>Jatuh tempo</span><span id="labelJatuhTempo" style="color:#222">–</span></div>
-            <div style="display:flex;justify-content:space-between"><span>Layanan</span><span id="labelLayanan" style="color:#222">–</span></div>
-            <div style="display:flex;justify-content:space-between"><span>Barang</span><span id="labelBarang" style="color:#222">–</span></div>
-          </div>
-          <div style="border-top:1px dashed #ddd;margin-top:8px;padding-top:8px;text-align:left">
-            <span style="font-size:11px;color:#555">Kode storage box:</span>
-            <div style="border-bottom:1px solid #999;height:16px;margin-top:2px"></div>
-          </div>
-          <p style="font-size:9.5px;color:#0c447c;background:#e6f1fb;border-radius:6px;padding:6px 8px;margin:10px 0 0;text-align:left">Minta kode order + 6 angka terakhir NIK saat pengambilan.</p>
-        </div>
+      <div class="foto-side">
+        <img src="https://lh3.googleusercontent.com/d/1iIQMGqj8DViqMGpDrklGk03-7xls1Ivt" alt="Tim NitipBox siap melayani">
+        <img src="https://lh3.googleusercontent.com/d/1zBZZdhJRIOmQAPCMFiz0H-iHTiC6ZO3D" alt="Admin NitipBox mengelola barang titipan">
       </div>
-      <div class="edit-modal-actions" style="padding:0 18px 18px">
-        <button type="button" id="btnCetakLabel" class="btn btn-tosca-solid">🖨️ Cetak / simpan label</button>
+    </div>
+    <p class="foto-caption">Ilustrasi sistem penyimpanan NitipBox</p>
+  </div>
+
+  <div class="testimoni-section">
+    <h3>⭐ Kata Pelanggan Kami</h3>
+    <div class="testimoni-grid">
+      <div class="testimoni-card">
+        <div class="testimoni-bintang">★★★★★</div>
+        <p>"Pelayanannya baik, amanah, good."</p>
+        <span>— Nur Afidah</span>
+      </div>
+      <div class="testimoni-card">
+        <div class="testimoni-bintang">★★★★★</div>
+        <p>"Amanah dan sangat membantu buat yang transit di Surabaya/Sidoarjo, dekat dengan bandara Juanda. Tarif juga sangat murah."</p>
+        <span>— Muhammad Yusril M.</span>
       </div>
     </div>
   </div>
 
-  <!-- MODAL TAMBAH PEMASUKAN LAIN -->
-  <div id="pemasukanModalOverlay" class="edit-modal-overlay">
-    <div class="edit-modal">
-      <div class="edit-modal-head">
-        <span>Tambah pemasukan lain</span>
-        <button id="btnTutupPemasukan" class="edit-modal-close" aria-label="Tutup">✕</button>
+  <div class="leads-section">
+    <div class="leads-inner">
+      <div class="leads-title">Belum siap titip sekarang?</div>
+      <div class="leads-sub">Daftarkan nomor WA kamu — kami kabari saat ada promo menarik & penawaran spesial!</div>
+      <div class="leads-form-row">
+        <input type="text" class="leads-input" id="leadsNama" placeholder="Nama kamu" oninput="this.style.outline='none'">
+        <input type="text" class="leads-input" id="leadsWa" placeholder="Nomor WhatsApp" oninput="this.style.outline='none'">
+        <button class="leads-btn" onclick="simpanLeadsForm()">Kabari Saya 🔔</button>
       </div>
-      <form id="formPemasukan" class="edit-modal-body">
-        <div class="edit-field">
-          <label>Tanggal</label>
-          <input type="date" id="pemasukanTanggal" required>
-        </div>
-        <div class="edit-field">
-          <label>Keterangan</label>
-          <input type="text" id="pemasukanKeterangan" placeholder="Contoh: Setor modal awal" required>
-        </div>
-        <div class="edit-field">
-          <label>Cabang / Point</label>
-          <select id="pemasukanLokasi">
-            <option value="">Umum (semua cabang)</option>
-            <option value="Surabaya">Surabaya</option>
-            <option value="Sidoarjo">Sidoarjo</option>
-            <option value="Sidoarjo 2 (Back Up)">Sidoarjo 2</option>
-          </select>
-        </div>
-        <div class="edit-field">
-          <label>Jumlah (Rp)</label>
-          <input type="number" id="pemasukanJumlah" min="0" required>
-        </div>
-        <div class="edit-modal-actions">
-          <button type="button" id="btnBatalPemasukan" class="btn btn-ghost">Batal</button>
-          <button type="submit" class="btn btn-tosca-solid">Simpan pemasukan</button>
-        </div>
-      </form>
+      <div class="leads-note">Tidak akan di-spam. Hanya info promo & penawaran menarik dari NitipBox.</div>
+      <div class="leads-success" id="leadsSuccess">✅ Terima kasih! Kami akan menghubungimu saat ada promo menarik 😊</div>
     </div>
   </div>
 
-  <!-- MODAL SCANNER QR CHECKOUT -->
-  <div id="scannerModalOverlay" class="edit-modal-overlay">
-    <div class="edit-modal scanner-modal">
-      <div class="edit-modal-head">
-        <span>Scan untuk checkout</span>
-        <button id="btnTutupScanner" class="edit-modal-close" aria-label="Tutup">✕</button>
+  <div class="benefit-section">
+    <h3>Keuntungan Menggunakan Jasa NitipBox</h3>
+    <div class="benefit-grid">
+      <div class="benefit-item"><div class="benefit-icon">🚚</div><h4>Layanan Jemput Paket</h4><p>Gak perlu repot keluar rumah, kurir sigap kami siap menjemput barang titipan langsung dari depan pintumu.</p></div>
+      <div class="benefit-item"><div class="benefit-icon">🛡️</div><h4>Keamanan Berlapis</h4><p>Area penyimpanan bersih, kering, steril, terpantau kamera CCTV pengawas penuh + 3x Proses Verified Saat Pengambilan Barang.</p></div>
+      <div class="benefit-item"><div class="benefit-icon">💸</div><h4>Skema Diskon Besar</h4><p>Makin lama kamu menitipkan barang, makin murah biayanya dengan potongan hingga 30% untuk durasi bulanan.</p></div>
+      <div class="benefit-item"><div class="benefit-icon">📱</div><h4>Pelacakan Sistem Transparan</h4><p>Pantau langsung tanggal jatuh tempo penyimpananmu secara berkala kapan saja hanya dengan kode booking unik.</p></div>
+    </div>
+  </div>
+
+  <div class="lokasi-section">
+    <h3>📍 Lokasi Point NitipBox</h3>
+    <p class="lokasi-subtitle">Pilih point terdekat dari lokasimu</p>
+    <div class="lokasi-grid" id="lokasiGrid"></div>
+  </div>
+
+  <div class="faq-section">
+    <h3>❓ Pertanyaan yang Sering Ditanyakan</h3>
+    <p class="faq-subtitle">Temukan jawaban cepat di sini, atau hubungi admin jika belum terjawab</p>
+    <div class="faq-categories">
+      <button class="faq-cat-btn active" onclick="filterFaq('semua', this)">🗂 Semua</button>
+      <button class="faq-cat-btn" onclick="filterFaq('layanan', this)">📦 Layanan</button>
+      <button class="faq-cat-btn" onclick="filterFaq('pembayaran', this)">💰 Pembayaran</button>
+      <button class="faq-cat-btn" onclick="filterFaq('antjemput', this)">🚚 Antar/Jemput</button>
+      <button class="faq-cat-btn" onclick="filterFaq('pengambilan', this)">📋 Pengambilan</button>
+    </div>
+    <div class="faq-wrapper">
+      <div class="faq-item" data-cat="layanan">
+        <div class="faq-question" onclick="toggleFaq(this)">Barang apa saja yang bisa dititipkan?<span class="faq-icon">+</span></div>
+        <div class="faq-answer">Semua jenis barang dari ukuran kecil hingga ekstra besar. Ada 5 kategori ukuran:<ul><li><strong>S (Kecil)</strong> — tas kecil, dokumen, elektronik kecil</li><li><strong>M (Sedang)</strong> — Elektronic Sedang (Rice cooker, air fryer,TV 24 inch kebawah), ransel besar, kardus sedang</li><li><strong>L (Besar)</strong> — Koper besar, kardus besar, sepeda lipat, TV 32 Inch Keatas</li><li><strong>XL (Ekstra)</strong> — Sepeda gunung, motor standard, Kursi, Lemari plastik/kayu 1pintu, furniture, barang pindahan</li><li><strong>XXL+ (Super)</strong> — Motor Gede, Gabungan Furniture & barang pindahan dll </li></ul></div>
       </div>
-      <div class="edit-modal-body">
-        <div id="qrReaderBox"></div>
-        <p id="scannerMsg" class="label-search-msg"></p>
-        <p class="scanner-manual-toggle" id="btnToggleManual">Tidak bisa scan? Input kode manual</p>
-        <div id="wrapManualKode" style="display:none">
-          <div class="label-search-row">
-            <input type="text" id="manualKodeInput" placeholder="Contoh: NTB-SBY-0001">
-            <button id="btnKirimManualKode" class="btn-tosca-solid">Lanjut</button>
-          </div>
-        </div>
+      <div class="faq-item" data-cat="layanan">
+        <div class="faq-question" onclick="toggleFaq(this)">Berapa lama minimal penitipan?<span class="faq-icon">+</span></div>
+        <div class="faq-answer">Minimal <strong>1 hari</strong>, tidak ada batas maksimal. Makin lama titip, makin hemat karena ada diskon paket mingguan (hemat 15%) dan bulanan (hemat 30%).</div>
+      </div>
+      <div class="faq-item" data-cat="layanan">
+        <div class="faq-question" onclick="toggleFaq(this)">Apakah barang saya aman di NitipBox?<span class="faq-icon">+</span></div>
+        <div class="faq-answer">Keamanan adalah prioritas kami. Setiap barang yang masuk:<ul><li>Difoto dokumentasi dari semua sisi sebelum disimpan</li><li>Diberi kode unik <strong>NTB-XXXX</strong> sebagai identitas</li><li>Disimpan di area khusus yang bersih dan terpantau</li><li>Diverifikasi 3x saat proses pengambilan</li></ul></div>
+      </div>
+      <div class="faq-item" data-cat="pembayaran">
+        <div class="faq-question" onclick="toggleFaq(this)">Bagaimana sistem pembayarannya?<span class="faq-icon">+</span></div>
+        <div class="faq-answer">Ada 2 pilihan:<ul><li><strong>Lunas di muka</strong> — bayar penuh saat antar barang</li><li><strong>DP 30% di awal</strong> — sisanya dilunasi saat pengambilan barang</li></ul></div>
+      </div>
+      <div class="faq-item" data-cat="pembayaran">
+        <div class="faq-question" onclick="toggleFaq(this)">Metode pembayaran apa yang diterima?<span class="faq-icon">+</span></div>
+        <div class="faq-answer">Kami menerima:<ul><li>💳 Transfer bank</li><li>📱 QRIS (semua e-wallet & mobile banking)</li><li>💵 Tunai</li></ul></div>
+      </div>
+      <div class="faq-item" data-cat="antjemput">
+        <div class="faq-question" onclick="toggleFaq(this)">Apakah ada layanan antar/jemput barang?<span class="faq-icon">+</span></div>
+        <div class="faq-answer">Ada! Saat ini tersedia untuk ukuran <strong>S, M, dan L</strong>. Untuk XL dan XXL+ belum tersedia <span class="tag-soon">Segera Hadir</span><div class="tarif-box"><div class="tarif-row"><span>Antar ATAU Jemput (salah satu)</span><span><strong>Rp 3.000/km</strong></span></div><div class="tarif-row"><span>Antar DAN Jemput (keduanya)</span><span><strong>Rp 5.000/km</strong></span></div></div>Tarif dihitung dari titik lokasi kamu ke NitipBox.</div>
+      </div>
+      <div class="faq-item" data-cat="pengambilan">
+        <div class="faq-question" onclick="toggleFaq(this)">Bagaimana cara mengambil barang?<span class="faq-icon">+</span></div>
+        <div class="faq-answer">Untuk pengambilan sendiri, siapkan:<ul class="step-list"><li><div class="step-num">1</div><div>Kode booking (contoh: NTB-0001)</div></li><li><div class="step-num">2</div><div>Bukti pembayaran (nota / kwitansi / screenshot transfer)</div></li><li><div class="step-num">3</div><div>6 angka terakhir nomor identitas (KTP/SIM)</div></li></ul></div>
+      </div>
+      <div class="faq-item" data-cat="pengambilan">
+        <div class="faq-question" onclick="toggleFaq(this)">Bolehkah orang lain mengambil barang atas nama saya?<span class="faq-icon">+</span></div>
+        <div class="faq-answer">Boleh! Dengan membawa:<ul><li>📄 Surat kuasa dari pemilik barang</li><li>🪪 Foto identitas pemilik/penitip barang (KTP/SIM)</li><li>🪪 Foto identitas pribadi pengambil</li></ul></div>
+      </div>
+    </div>
+    <div class="faq-still-confused">
+      <p>Masih ada pertanyaan yang belum terjawab? 😊</p>
+      <a href="https://wa.me/6285174271037?text=Halo%20NitipBox!%20Saya%20ingin%20bertanya%20tentang%20layanan%20penitipan." class="btn-wa-faq" target="_blank">💬 Tanya Langsung ke Admin</a>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-brand">NitipBox</div>
+    <div class="footer-tagline">Titip Aman, Hati Tenang</div>
+    <div class="footer-links">
+      <a href="https://nitipbox.my.id">Beranda</a>
+      <a href="#" onclick="bukaSK();return false;">Syarat & Ketentuan</a>
+      <a href="https://wa.me/6285174271037">Hubungi Kami</a>
+      <a href="https://maps.app.goo.gl/nitipbox">Google Maps</a>
+    </div>
+    <div class="footer-copy">© 2026 NitipBox. Semua hak dilindungi.</div>
+  </div>
+
+  <a href="https://wa.me/6285174271037?text=Halo%20NitipBox,%20saya%20ingin%20bertanya%20tentang%20layanan%20penitipan" class="wa-float" target="_blank"><span>💬</span> Chat Admin</a>
+
+  <div class="sk-modal-overlay" id="skModal">
+    <div class="sk-modal">
+      <div class="sk-modal-header">
+        <h2>📋 Syarat & Ketentuan NitipBox</h2>
+        <button class="sk-modal-close" onclick="tutupSK()">✕</button>
+      </div>
+      <div class="sk-modal-body">
+        <div class="highlight">Dengan melakukan booking, kamu menyetujui seluruh syarat dan ketentuan berikut. Harap baca dengan seksama sebelum melanjutkan.</div>
+        <h3>1. Layanan NitipBox</h3>
+        <ul>
+          <li>NitipBox menyediakan jasa penyimpanan barang harian dengan 5 kategori ukuran: S, M, L, XL, dan XXL+</li>
+          <li>Penitipan minimal 1 hari, tidak ada batas maksimal</li>
+          <li>Pelanggan bertanggung jawab memastikan isi barang yang dititipkan sesuai dengan informasi yang diberikan saat booking</li>
+          <li>Setiap barang yang diterima akan didokumentasikan dalam bentuk foto dan dicatat kondisi fisiknya sebagai referensi selama masa penitipan</li>
+          <li>Setelah Didokumentaikan Setiap barang yang masuk akan diberi kode unik NTB-XXXX</li>
+        </ul>
+        <h3>2. Pembayaran</h3>
+        <ul>
+          <li>Bisa dilunasi penuh di muka, atau DP minimal 30% saat barang diantar</li>
+          <li>Pelunasan wajib diselesaikan sebelum barang diserahkan kembali</li>
+          <li>Metode pembayaran: Transfer bank, QRIS, atau Tunai</li>
+          <li>Paket mingguan hemat 15%, paket bulanan hemat 30%</li>
+        </ul>
+        <h3>3. Keterlambatan Pengambilan</h3>
+        <ul>
+          <li>Lebih dari 24 jam / H+1 setelah jatuh tempo: dikenakan tambahan tarif harian</li>
+          <li>Lebih dari 7 hari setelah jatuh tempo: dikenakan tambahan tarif 85% dari tarif harian per harinya</li>
+          <li>Apabila setelah 30 hari sejak jatuh tempo pelanggan tidak dapat dihubungi, NitipBox berhak mengambil tindakan administratif yang diperlukan untuk menutup biaya penyimpanan yang terus berjalan.</li>
+        </ul>
+        <h3>4. Barang yang Tidak Diterima</h3>
+        <ul>
+          <li>Senjata, Bahan kimia berbahaya, makanan/minuman, hewan hidup, Barang mudah terbakar, Barang mudah meledak, Narkotika, Uang tunai, Perhiasan bernilai tinggi, Dokumen negara yang bersifat rahasia</li>
+          <li>NitipBox berhak menolak barang yang dianggap tidak sesuai tanpa penjelasan lebih lanjut</li>
+        </ul>
+        <h3>5. Tanggung Jawab NitipBox</h3>
+        <ul>
+          <li>NitipBox bertanggung jawab atas kerusakan atau kehilangan akibat kelalaian NitipBox</li>
+          <li>NitipBox TIDAK bertanggung jawab atas kerusakan yang sudah ada sebelum barang diterima (terdokumentasi di foto)</li>
+          <li>NitipBox TIDAK bertanggung jawab atas kejadian force majeure (bencana alam, kebakaran, dll) akan tetapi NitipBox akan tetap berupaya melakukan pengamanan dan penyelamatan barang sesuai kemampuan yang tersedia.</li>
+          <li>Nilai ganti rugi maksimal sebesar nilai pasar wajar barang saat kejadian, berdasarkan bukti kepemilikan, bukti pembelian, atau referensi harga pasar yang dapat diverifikasi.</li>
+        </ul>
+        <h3>6. Pengambilan Barang</h3>
+        <ul>
+          <li>Wajib menunjukkan: kode booking + bukti pembayaran + 6 digit terakhir nomor identitas</li>
+          <li>Pengambilan oleh orang lain: wajib membawa surat kuasa + foto identitas pemilik + foto identitas pengambil</li>
+          <li>Barang hanya diserahkan setelah pembayaran lunas</li>
+        </ul>
+        <h3>7. Layanan Antar/Jemput</h3>
+        <ul>
+          <li>Tersedia untuk ukuran S, M, dan L. Mohon Maaf Untuk Ukuran XL dan XXL+ belum tersedia</li>
+          <li>Tarif antar ATAU jemput: Rp 3.000/km dari titik lokasi</li>
+          <li>Tarif antar DAN jemput: Rp 5.000/km dari titik lokasi</li>
+        </ul>
+        <h3>8. Privasi Data</h3>
+        <ul>
+          <li>Data pribadi pelanggan (nama, WA, identitas) hanya digunakan untuk keperluan operasional NitipBox</li>
+          <li>Data tidak akan dibagikan kepada pihak ketiga tanpa persetujuan pelanggan</li>
+        </ul>
+        <div class="highlight">Dengan menyetujui S&K ini, kamu mengakui telah membaca dan memahami seluruh ketentuan di atas. Perjanjian penitipan lengkap akan dikirimkan via WhatsApp sebelum barang diantar.</div>
+      </div>
+      <div class="sk-modal-footer">
+        <button class="sk-btn-setuju" onclick="setujuSK()">✅ Saya Mengerti & Setuju</button>
       </div>
     </div>
   </div>
 
-  <script src="admin.js"></script>
+  <script src="app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
