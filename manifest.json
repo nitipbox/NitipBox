@@ -1,8 +1,8 @@
 {
-  "name": "NitipBox Admin",
-  "short_name": "NitipBox Admin",
-  "description": "Panel admin NitipBox - kelola order, label, keuangan, dan galeri",
-  "start_url": "/admin.html",
+  "name": "NitipBox - Titip Aman, Hati Tenang",
+  "short_name": "NitipBox",
+  "description": "Jasa penitipan barang harian di Surabaya dan Sidoarjo, mulai Rp 3.000/hari",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
