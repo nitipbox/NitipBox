@@ -1,5 +1,5 @@
 var CACHE_NAME = 'nitipbox-cache-v1';
-var URLS_TO_CACHE = ['/', '/index.html'];
+var URLS_TO_CACHE = ['/', '/index.html', '/admin.html'];
 
 self.addEventListener('install', function(event) {
   event.waitUntil(
