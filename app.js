@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
 /* =============================================
    PROMO BANNER & COUNTDOWN
    ============================================= */
-var PROMO_END = new Date('2026-07-07T23:59:59');
+var PROMO_END = new Date('2026-07-19T23:59:59');
 var PROMO_ACTIVE = true;
 
 function initPromo() {
