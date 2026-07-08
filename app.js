@@ -7,7 +7,7 @@ const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
    DATA LOKASI — edit di sini untuk ubah/tambah point
    ============================================= */
 var datLokasi = [
-  { nama: "Surabaya", alamat: "Manukan Wasono V No.9 Blok 23C", area: "Surabaya Barat, Kec. Tandes, Surabaya", jam: "Senin–Minggu: 08.00–21.00", wa: "6285174271037", status: "aktif" },
+  { nama: "Surabaya (Back Up)", alamat: "Manukan Wasono", area: "Surabaya Barat, Kec. Tandes, Surabaya", jam: "Senin–Minggu: 08.00–21.00", wa: "6285174271037", status: "aktif" },
   { nama: "Sidoarjo", alamat: "Jl. Raya Kundi No.63, Belakang Warkop Caisar", area: "Wadungasri, Kec. Waru, Sidoarjo", jam: "Senin–Minggu: 08.00–21.00", wa: "6285731283199", status: "aktif" },
   { nama: "Sidoarjo 2 (Back Up)", alamat: "", area: "Tambaksumur, Kec. Waru, Sidoarjo", jam: "Senin–Minggu: 08.00–21.00", wa: "6281336076175", status: "aktif" }
 ];
